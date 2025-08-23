@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { 
   Home, 
@@ -6,13 +6,38 @@ import {
   Activity, 
   Brain, 
   Settings,
-  User
+  User,
+  Menu,
+  X,
+  LogOut,
+  ChevronDown
 } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
+import { ThemeToggle } from './ThemeToggle'
+import { useThemeStore } from '../stores/themeStore'
 
 export function AppShell({ children }) {
   const location = useLocation()
   const { user, logout } = useAuthStore()
+  const { initTheme } = useThemeStore()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  // Initialize theme on component mount
+  useEffect(() => {
+    initTheme()
+  }, [initTheme])
+
+  // Handle scroll effect for header
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
+    }
+    
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
@@ -21,60 +46,163 @@ export function AppShell({ children }) {
     { name: 'Insights', href: '/insights', icon: Brain },
   ]
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
+  const toggleUserMenu = () => {
+    setUserMenuOpen(!userMenuOpen)
+  }
+
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-bg dark:bg-dark-bg">
       {/* Header */}
-      <header className="bg-surface shadow-card border-b border-gray-200">
+      <header className={`sticky top-0 z-30 bg-surface dark:bg-dark-surface border-b border-border dark:border-dark-border transition-shadow ${
+        scrolled ? 'shadow-card' : ''
+      }`}>
         <div className="container">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center">
+              {/* Mobile menu button */}
+              <button
+                type="button"
+                className="md:hidden p-2 mr-2 rounded-md text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                onClick={toggleMobileMenu}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-menu"
+                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5" aria-hidden="true" />
+                ) : (
+                  <Menu className="w-5 h-5" aria-hidden="true" />
+                )}
+              </button>
+              
+              {/* Logo */}
               <Link to="/" className="text-xl font-bold text-primary">
                 ResilientFlow
               </Link>
-              <nav className="hidden md:flex space-x-6">
+              
+              {/* Desktop navigation */}
+              <nav className="hidden md:flex ml-8 space-x-1">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     to={item.href}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       location.pathname === item.href
-                        ? 'text-primary bg-primary/10'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
+                        ? 'text-primary bg-primary-light dark:bg-primary/20'
+                        : 'text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-border/50'
                     }`}
+                    aria-current={location.pathname === item.href ? 'page' : undefined}
                   >
-                    <item.icon className="w-4 h-4" />
+                    <item.icon className="w-4 h-4" aria-hidden="true" />
                     <span>{item.name}</span>
                   </Link>
                 ))}
               </nav>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-text-secondary">
-                <User className="w-4 h-4" />
-                <span>{user?.username}</span>
-                <span className="px-2 py-1 bg-accent/20 text-accent rounded-sm text-xs font-medium">
-                  {user?.subscriptionTier}
-                </span>
+            <div className="flex items-center space-x-2">
+              {/* Theme toggle */}
+              <ThemeToggle />
+              
+              {/* User menu */}
+              <div className="relative">
+                <button
+                  type="button"
+                  className="flex items-center space-x-2 p-2 rounded-md text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                  onClick={toggleUserMenu}
+                  aria-expanded={userMenuOpen}
+                  aria-haspopup="true"
+                >
+                  <User className="w-5 h-5" aria-hidden="true" />
+                  <span className="hidden sm:inline text-sm font-medium">{user?.username}</span>
+                  <span className="hidden sm:inline px-2 py-1 bg-accent/20 text-accent dark:bg-accent/10 dark:text-accent/90 rounded-sm text-xs font-medium">
+                    {user?.subscriptionTier}
+                  </span>
+                  <ChevronDown className="w-4 h-4" aria-hidden="true" />
+                </button>
+                
+                {/* User dropdown menu */}
+                {userMenuOpen && (
+                  <div 
+                    className="absolute right-0 mt-2 w-48 bg-surface dark:bg-dark-surface rounded-md shadow-lg border border-border dark:border-dark-border py-1 z-50"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="user-menu"
+                  >
+                    <div className="px-4 py-2 border-b border-border dark:border-dark-border">
+                      <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">{user?.username}</p>
+                      <p className="text-xs text-text-secondary dark:text-dark-text-secondary truncate">{user?.email}</p>
+                    </div>
+                    <Link
+                      to="/settings"
+                      className="block px-4 py-2 text-sm text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50"
+                      role="menuitem"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <div className="flex items-center">
+                        <Settings className="w-4 h-4 mr-2" aria-hidden="true" />
+                        Settings
+                      </div>
+                    </Link>
+                    <button
+                      className="w-full text-left block px-4 py-2 text-sm text-error hover:bg-gray-100 dark:hover:bg-dark-border/50"
+                      role="menuitem"
+                      onClick={() => {
+                        setUserMenuOpen(false)
+                        logout()
+                      }}
+                    >
+                      <div className="flex items-center">
+                        <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
+                        Sign out
+                      </div>
+                    </button>
+                  </div>
+                )}
               </div>
-              <button
-                onClick={logout}
-                className="text-text-secondary hover:text-text-primary"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
             </div>
           </div>
         </div>
+        
+        {/* Mobile menu, show/hide based on menu state */}
+        {mobileMenuOpen && (
+          <div 
+            className="md:hidden border-t border-border dark:border-dark-border"
+            id="mobile-menu"
+          >
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium ${
+                    location.pathname === item.href
+                      ? 'text-primary bg-primary-light dark:bg-primary/20'
+                      : 'text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-border/50'
+                  }`}
+                  aria-current={location.pathname === item.href ? 'page' : undefined}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <item.icon className="w-5 h-5" aria-hidden="true" />
+                  <span>{item.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
-      <main className="container py-8">
+      <main className="container py-6 md:py-8 pb-20 md:pb-8">
         {children}
       </main>
 
       {/* Mobile Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-gray-200 px-4 py-2">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface dark:bg-dark-surface border-t border-border dark:border-dark-border px-4 py-2 z-20">
         <div className="flex justify-around">
           {navigation.map((item) => (
             <Link
@@ -83,10 +211,11 @@ export function AppShell({ children }) {
               className={`flex flex-col items-center space-y-1 p-2 rounded-md ${
                 location.pathname === item.href
                   ? 'text-primary'
-                  : 'text-text-secondary'
+                  : 'text-text-secondary dark:text-dark-text-secondary'
               }`}
+              aria-current={location.pathname === item.href ? 'page' : undefined}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className="w-5 h-5" aria-hidden="true" />
               <span className="text-xs">{item.name}</span>
             </Link>
           ))}

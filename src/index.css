@@ -4,16 +4,79 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-theme duration-base;
   }
+  
+  html {
+    @apply antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
   body {
     @apply bg-bg text-text-primary;
-    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Dark mode styles */
+  .dark body {
+    @apply bg-dark-bg text-dark-text-primary;
+  }
+  
+  /* Focus styles for accessibility */
+  :focus-visible {
+    @apply outline-none shadow-focus rounded-sm;
+  }
+  
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold text-text-primary;
+  }
+  
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    @apply text-dark-text-primary;
+  }
+  
+  /* Form elements */
+  input, textarea, select {
+    @apply bg-surface border-border rounded-md px-3 py-2 text-text-primary;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary;
+    @apply disabled:bg-bg disabled:text-text-tertiary disabled:cursor-not-allowed;
+  }
+  
+  .dark input, .dark textarea, .dark select {
+    @apply bg-dark-surface border-dark-border text-dark-text-primary;
+    @apply focus:ring-primary/70 focus:border-primary;
+    @apply disabled:bg-dark-bg disabled:text-dark-text-tertiary;
   }
 }
 
 @layer components {
   .container {
-    @apply max-w-7xl mx-auto px-6;
+    @apply max-w-7xl mx-auto px-4 sm:px-6;
+  }
+  
+  /* Consistent spacing for sections */
+  .section-spacing {
+    @apply py-6 md:py-8;
+  }
+  
+  /* Card styles */
+  .card {
+    @apply bg-surface rounded-lg shadow-card border border-border p-6;
+  }
+  
+  .dark .card {
+    @apply bg-dark-surface border-dark-border;
+  }
+  
+  /* Button base styles */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md font-medium;
+    @apply transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50;
+    @apply disabled:cursor-not-allowed;
+  }
+  
+  /* Accessibility helper classes */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
   }
 }
