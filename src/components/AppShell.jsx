@@ -10,7 +10,9 @@ import {
   Menu,
   X,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Shield,
+  Puzzle
 } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { ThemeToggle } from './ThemeToggle'
@@ -146,6 +148,28 @@ export function AppShell({ children }) {
                       <div className="flex items-center">
                         <Settings className="w-4 h-4 mr-2" aria-hidden="true" />
                         Settings
+                      </div>
+                    </Link>
+                    <Link
+                      to="/settings/privacy"
+                      className="block px-4 py-2 text-sm text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50"
+                      role="menuitem"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <div className="flex items-center">
+                        <Shield className="w-4 h-4 mr-2" aria-hidden="true" />
+                        Privacy
+                      </div>
+                    </Link>
+                    <Link
+                      to="/integrations"
+                      className="block px-4 py-2 text-sm text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50"
+                      role="menuitem"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <div className="flex items-center">
+                        <Puzzle className="w-4 h-4 mr-2" aria-hidden="true" />
+                        Integrations
                       </div>
                     </Link>
                     <button
