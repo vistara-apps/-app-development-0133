@@ -92,6 +92,11 @@ export default {
       transitionProperty: {
         'theme': 'background-color, border-color, color, fill, stroke',
       },
+      transitionDuration: {
+        'fast': '150ms',
+        'base': '250ms',
+        'slow': '400ms',
+      },
     },
   },
   plugins: [],
