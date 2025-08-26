@@ -4,6 +4,7 @@ import { Button } from '../components/Button'
 import { Modal } from '../components/Modal'
 import { Input } from '../components/Input'
 import { useDataStore } from '../stores/dataStore'
+import { Link } from 'react-router-dom'
 import { 
   Play, 
   Clock, 
@@ -12,7 +13,9 @@ import {
   Heart,
   Brain,
   Smile,
-  Zap
+  Zap,
+  Users,
+  ArrowRight
 } from 'lucide-react'
 
 export function ActivitiesPage() {
@@ -101,6 +104,32 @@ export function ActivitiesPage() {
         ))}
       </div>
 
+      {/* Support Circles Promotion */}
+      <Card className="p-6 border-l-4 border-primary">
+        <div className="flex items-start md:items-center md:justify-between">
+          <div className="flex items-start space-x-4">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Users className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-text-primary mb-1">
+                Practice Together in Support Circles
+              </h3>
+              <p className="text-text-secondary">
+                Join a group to practice activities together and share your progress
+              </p>
+            </div>
+          </div>
+          <Link 
+            to="/circles"
+            className="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+          >
+            Explore Circles
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Link>
+        </div>
+      </Card>
+      
       {/* Activities Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredActivities.map((activity) => {

@@ -7,6 +7,7 @@ import {
   Brain, 
   Settings,
   User,
+  Users,
   Menu,
   X,
   LogOut,
@@ -44,6 +45,7 @@ export function AppShell({ children }) {
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
     { name: 'Activities', href: '/activities', icon: Activity },
     { name: 'Insights', href: '/insights', icon: Brain },
+    { name: 'Circles', href: '/circles', icon: Users },
   ]
 
   const toggleMobileMenu = () => {
