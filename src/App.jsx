@@ -5,6 +5,7 @@ import { HomePage } from './pages/HomePage'
 import { DashboardPage } from './pages/DashboardPage'
 import { ActivitiesPage } from './pages/ActivitiesPage'
 import { InsightsPage } from './pages/InsightsPage'
+import { SupportCirclesPage } from './pages/SupportCirclesPage'
 import { AuthPage } from './pages/AuthPage'
 import { OnboardingPage } from './pages/OnboardingPage'
 import { useAuthStore } from './stores/authStore'
@@ -27,6 +28,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/activities" element={<ActivitiesPage />} />
         <Route path="/insights" element={<InsightsPage />} />
+        <Route path="/circles" element={<SupportCirclesPage />} />
       </Routes>
     </AppShell>
   )
