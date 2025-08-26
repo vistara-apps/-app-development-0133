@@ -10,7 +10,9 @@ import {
   Menu,
   X,
   LogOut,
-  ChevronDown
+  ChevronDown,
+  CreditCard,
+  Crown
 } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { ThemeToggle } from './ThemeToggle'
@@ -44,6 +46,12 @@ export function AppShell({ children }) {
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
     { name: 'Activities', href: '/activities', icon: Activity },
     { name: 'Insights', href: '/insights', icon: Brain },
+  ]
+  
+  // Add subscription link to user menu
+  const userMenuItems = [
+    { name: 'Settings', href: '/settings', icon: Settings },
+    { name: 'Subscription', href: '/subscription', icon: CreditCard },
   ]
 
   const toggleMobileMenu = () => {
@@ -136,18 +144,31 @@ export function AppShell({ children }) {
                     <div className="px-4 py-2 border-b border-border dark:border-dark-border">
                       <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">{user?.username}</p>
                       <p className="text-xs text-text-secondary dark:text-dark-text-secondary truncate">{user?.email}</p>
-                    </div>
-                    <Link
-                      to="/settings"
-                      className="block px-4 py-2 text-sm text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50"
-                      role="menuitem"
-                      onClick={() => setUserMenuOpen(false)}
-                    >
-                      <div className="flex items-center">
-                        <Settings className="w-4 h-4 mr-2" aria-hidden="true" />
-                        Settings
+                      <div className="mt-1 flex items-center">
+                        {user?.subscriptionTier === 'premium' ? (
+                          <span className="flex items-center text-xs text-accent">
+                            <Crown className="w-3 h-3 mr-1" />
+                            Premium
+                          </span>
+                        ) : (
+                          <span className="text-xs text-text-secondary">Free Plan</span>
+                        )}
                       </div>
-                    </Link>
+                    </div>
+                    {userMenuItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className="block px-4 py-2 text-sm text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50"
+                        role="menuitem"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <item.icon className="w-4 h-4 mr-2" aria-hidden="true" />
+                          {item.name}
+                        </div>
+                      </Link>
+                    ))}
                     <button
                       className="w-full text-left block px-4 py-2 text-sm text-error hover:bg-gray-100 dark:hover:bg-dark-border/50"
                       role="menuitem"

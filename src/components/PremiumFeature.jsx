@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card } from './Card'
 import { Button } from './Button'
 import { Crown, Lock, ChevronRight } from 'lucide-react'
@@ -14,9 +15,18 @@ export function PremiumFeature({
   className = '',
 }) {
   const { user } = useAuthStore()
+  const navigate = useNavigate()
   const [showDetails, setShowDetails] = useState(false)
   
   const isPremium = user?.subscriptionTier === 'premium'
+  
+  const handleUpgrade = () => {
+    if (onUpgrade) {
+      onUpgrade()
+    } else {
+      navigate('/subscription')
+    }
+  }
   
   // If user is premium, just render the children
   if (isPremium) {
@@ -73,7 +83,7 @@ export function PremiumFeature({
           )}
           
           <Button 
-            onClick={onUpgrade}
+            onClick={handleUpgrade}
             size="sm"
           >
             <Lock className="w-4 h-4 mr-1" aria-hidden="true" />
@@ -97,6 +107,15 @@ export function UpgradePrompt({
   onUpgrade,
   className = '',
 }) {
+  const navigate = useNavigate()
+  
+  const handleUpgrade = () => {
+    if (onUpgrade) {
+      onUpgrade()
+    } else {
+      navigate('/subscription')
+    }
+  }
   return (
     <Card 
       className={`border-2 border-accent/20 ${className}`}
@@ -138,7 +157,7 @@ export function UpgradePrompt({
           </div>
           
           <Button 
-            onClick={onUpgrade}
+            onClick={handleUpgrade}
             size="lg"
           >
             Upgrade Now
@@ -148,4 +167,3 @@ export function UpgradePrompt({
     </Card>
   )
 }
-
