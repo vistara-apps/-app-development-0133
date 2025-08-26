@@ -1,59 +1,63 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card } from '../components/Card'
 import { Button } from '../components/Button'
-import { Modal } from '../components/Modal'
-import { Input } from '../components/Input'
+import { PulseCheck } from '../components/PulseCheck'
 import { useDataStore } from '../stores/dataStore'
+import { useStressDetection } from '../hooks/useStressDetection'
 import { format } from 'date-fns'
 import { 
-  CheckCircle, 
-  Circle, 
-  Smile, 
-  Meh, 
-  Frown,
   Target,
   Award,
-  Calendar
+  Calendar,
+  Activity,
+  AlertCircle,
+  Check,
+  Info
 } from 'lucide-react'
 
 export function HomePage() {
   const { 
     getTodayEntry, 
-    addDailyEntry, 
     getActivityCompletionStreak,
     activityLogs 
   } = useDataStore()
   
-  const [showCheckIn, setShowCheckIn] = useState(false)
-  const [emotionalState, setEmotionalState] = useState('')
-  const [notes, setNotes] = useState('')
-
+  const [showStressInfo, setShowStressInfo] = useState(false)
+  
   const todayEntry = getTodayEntry()
   const streak = getActivityCompletionStreak()
   const todayActivities = activityLogs.filter(
     log => log.completionDate === format(new Date(), 'yyyy-MM-dd')
   )
-
-  const handleCheckIn = () => {
-    if (!emotionalState) return
-
-    addDailyEntry({
-      userId: 'demo-user-1',
-      date: format(new Date(), 'yyyy-MM-dd'),
-      emotionalState,
-      notes
-    })
-
-    setShowCheckIn(false)
-    setEmotionalState('')
-    setNotes('')
-  }
-
-  const emotionOptions = [
-    { value: 'positive', icon: Smile, label: 'Positive', color: 'text-green-500' },
-    { value: 'neutral', icon: Meh, label: 'Neutral', color: 'text-yellow-500' },
-    { value: 'negative', icon: Frown, label: 'Negative', color: 'text-red-500' },
-  ]
+  
+  // Initialize stress detection
+  const { 
+    stressDetected, 
+    stressLevel, 
+    stressType, 
+    confidence,
+    getStressTypeDescription,
+    getStressSeverityDescription,
+    isAnalyzing,
+    analyzeCurrentEntry
+  } = useStressDetection({
+    autoDetect: true,
+    detectionThreshold: 3
+  });
+  
+  // Analyze stress when today's entry changes
+  useEffect(() => {
+    if (todayEntry && !isAnalyzing) {
+      analyzeCurrentEntry();
+    }
+  }, [todayEntry, isAnalyzing, analyzeCurrentEntry]);
+  
+  // Handle check-in completion
+  const handleCheckInComplete = (entryData) => {
+    // In a real implementation, this would trigger stress analysis
+    // and potentially generate contextual nudges
+    console.log('Check-in completed:', entryData);
+  };
 
   return (
     <div className="space-y-8">
@@ -68,7 +72,7 @@ export function HomePage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-4 gap-6">
         <Card className="p-6 text-center">
           <Award className="w-8 h-8 text-accent mx-auto mb-2" />
           <div className="text-2xl font-bold text-text-primary">{streak}</div>
@@ -88,45 +92,51 @@ export function HomePage() {
           </div>
           <div className="text-sm text-text-secondary">Daily Check-in</div>
         </Card>
+        
+        {stressDetected && (
+          <Card className="p-6 text-center">
+            <Activity className="w-8 h-8 text-red-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-text-primary">
+              {getStressSeverityDescription()}
+            </div>
+            <div className="text-sm text-text-secondary flex items-center justify-center">
+              Stress Level
+              <button 
+                onClick={() => setShowStressInfo(!showStressInfo)}
+                className="ml-1 text-primary"
+              >
+                <Info className="w-3 h-3" />
+              </button>
+            </div>
+          </Card>
+        )}
       </div>
+      
+      {/* Stress Info */}
+      {showStressInfo && stressDetected && (
+        <Card className="p-4 border-l-4 border-l-red-500">
+          <div className="flex items-start space-x-3">
+            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-text-primary">Stress Detected</h3>
+              <p className="text-sm text-text-secondary mt-1">
+                Our AI has detected {getStressSeverityDescription().toLowerCase()} levels of {stressType} stress in your recent entries.
+                {stressType && (
+                  <span className="block mt-1">{getStressTypeDescription()}</span>
+                )}
+              </p>
+              <div className="mt-2">
+                <Button size="sm" variant="secondary">
+                  View Stress Management Activities
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Daily Check-in */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-text-primary">Daily Check-in</h2>
-          <div className="text-sm text-text-secondary">
-            {format(new Date(), 'EEEE, MMMM d')}
-          </div>
-        </div>
-
-        {todayEntry ? (
-          <div className="flex items-center space-x-4 p-4 bg-accent/10 rounded-lg">
-            <CheckCircle className="w-6 h-6 text-accent" />
-            <div>
-              <div className="font-medium text-text-primary">Check-in completed!</div>
-              <div className="text-sm text-text-secondary">
-                Feeling {todayEntry.emotionalState} today
-                {todayEntry.notes && ` - ${todayEntry.notes}`}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-4">
-              <Circle className="w-6 h-6 text-text-secondary" />
-              <div>
-                <div className="font-medium text-text-primary">Ready for your daily check-in?</div>
-                <div className="text-sm text-text-secondary">
-                  Take a moment to reflect on your emotional state
-                </div>
-              </div>
-            </div>
-            <Button onClick={() => setShowCheckIn(true)}>
-              Start Check-in
-            </Button>
-          </div>
-        )}
-      </Card>
+      <PulseCheck onComplete={handleCheckInComplete} />
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-2 gap-6">
@@ -135,20 +145,41 @@ export function HomePage() {
             Recommended Activities
           </h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <div className="font-medium text-text-primary">Mindful Breathing</div>
-                <div className="text-sm text-text-secondary">5 min</div>
-              </div>
-              <Button size="sm" variant="ghost">Try Now</Button>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <div className="font-medium text-text-primary">Gratitude Journal</div>
-                <div className="text-sm text-text-secondary">3 min</div>
-              </div>
-              <Button size="sm" variant="ghost">Try Now</Button>
-            </div>
+            {stressDetected ? (
+              <>
+                <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <div>
+                    <div className="font-medium text-text-primary">Progressive Relaxation</div>
+                    <div className="text-sm text-text-secondary">7 min - Good for stress</div>
+                  </div>
+                  <Button size="sm" variant="ghost">Try Now</Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <div>
+                    <div className="font-medium text-text-primary">Breathing Exercise</div>
+                    <div className="text-sm text-text-secondary">3 min - Good for stress</div>
+                  </div>
+                  <Button size="sm" variant="ghost">Try Now</Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-medium text-text-primary">Mindful Breathing</div>
+                    <div className="text-sm text-text-secondary">5 min</div>
+                  </div>
+                  <Button size="sm" variant="ghost">Try Now</Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <div className="font-medium text-text-primary">Gratitude Journal</div>
+                    <div className="text-sm text-text-secondary">3 min</div>
+                  </div>
+                  <Button size="sm" variant="ghost">Try Now</Button>
+                </div>
+              </>
+            )}
           </div>
         </Card>
 
@@ -170,65 +201,23 @@ export function HomePage() {
           </div>
         </Card>
       </div>
-
-      {/* Check-in Modal */}
-      <Modal
-        isOpen={showCheckIn}
-        onClose={() => setShowCheckIn(false)}
-        title="Daily Emotional Check-in"
-        className="max-w-lg"
-      >
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-3">
-              How are you feeling today?
-            </label>
-            <div className="grid grid-cols-3 gap-3">
-              {emotionOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setEmotionalState(option.value)}
-                  className={`
-                    p-4 rounded-lg border-2 transition-all text-center
-                    ${emotionalState === option.value
-                      ? 'border-primary bg-primary/10'
-                      : 'border-gray-200 hover:border-gray-300'
-                    }
-                  `}
-                >
-                  <option.icon className={`w-8 h-8 mx-auto mb-2 ${option.color}`} />
-                  <div className="text-sm font-medium">{option.label}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <Input
-            label="Any notes about your day? (optional)"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="What's on your mind?"
-            rows={3}
-          />
-
-          <div className="flex space-x-3">
-            <Button 
-              variant="secondary" 
-              className="flex-1"
-              onClick={() => setShowCheckIn(false)}
-            >
-              Cancel
-            </Button>
-            <Button 
-              className="flex-1"
-              onClick={handleCheckIn}
-              disabled={!emotionalState}
-            >
-              Complete Check-in
-            </Button>
-          </div>
+      
+      {/* Calendar Events */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium text-text-primary">Upcoming Events</h3>
+          <Button size="sm" variant="ghost">
+            Connect Calendar
+          </Button>
         </div>
-      </Modal>
+        
+        <div className="text-center py-6">
+          <Calendar className="w-12 h-12 text-text-secondary mx-auto mb-2" />
+          <p className="text-text-secondary">
+            Connect your Google Calendar to see upcoming events and get preparation suggestions.
+          </p>
+        </div>
+      </Card>
     </div>
   )
 }
