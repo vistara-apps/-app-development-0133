@@ -3,25 +3,48 @@ import { Card } from '../components/Card'
 import { Button } from '../components/Button'
 import { Input } from '../components/Input'
 import { useAuthStore } from '../stores/authStore'
-import { Heart, Brain, Target, TrendingUp } from 'lucide-react'
+import { Heart, Brain, Target, TrendingUp, AlertCircle } from 'lucide-react'
+import { isSupabaseConfigured } from '../lib/supabase'
 
 export function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const { login } = useAuthStore()
+  const [username, setUsername] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const { signIn, signUp, login } = useAuthStore()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Demo login - in real app would validate credentials
-    login({
-      userId: 'demo-user-1',
-      email,
-      username: email.split('@')[0],
-      onboardingCompleted: true,
-      subscriptionTier: 'free',
-      createdAt: new Date().toISOString()
-    })
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      if (!isSupabaseConfigured()) {
+        // Use mock login if Supabase is not configured
+        login({
+          userId: 'demo-user-1',
+          email,
+          username: email.split('@')[0],
+          onboardingCompleted: true,
+          subscriptionTier: 'free',
+          createdAt: new Date().toISOString()
+        })
+        return
+      }
+      
+      if (isLogin) {
+        await signIn(email, password)
+      } else {
+        await signUp(email, password, { username: username || email.split('@')[0] })
+      }
+    } catch (err) {
+      console.error('Authentication error:', err)
+      setError(err.message || 'Authentication failed. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const features = [
@@ -105,16 +128,46 @@ export function AuthPage() {
               placeholder="Enter your password"
               required
             />
+            
+            {!isLogin && (
+              <Input
+                label="Username (optional)"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Choose a username"
+              />
+            )}
+            
+            {error && (
+              <div className="p-3 bg-red-100 text-red-700 rounded-md flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <p className="text-sm">{error}</p>
+              </div>
+            )}
 
-            <Button type="submit" className="w-full">
-              {isLogin ? 'Sign In' : 'Create Account'}
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading 
+                ? 'Processing...' 
+                : isLogin 
+                  ? 'Sign In' 
+                  : 'Create Account'
+              }
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <button
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin)
+                setError(null)
+              }}
               className="text-primary hover:underline"
+              disabled={isLoading}
             >
               {isLogin 
                 ? "Don't have an account? Sign up" 
@@ -124,11 +177,21 @@ export function AuthPage() {
           </div>
 
           {/* Demo access */}
-          <div className="mt-4 p-3 bg-accent/10 rounded-lg text-center">
-            <p className="text-sm text-text-secondary">
-              Demo access: Use any email/password to try the app
-            </p>
-          </div>
+          {!isSupabaseConfigured() && (
+            <div className="mt-4 p-3 bg-accent/10 rounded-lg text-center">
+              <p className="text-sm text-text-secondary">
+                Demo mode: Use any email/password to try the app
+              </p>
+            </div>
+          )}
+          
+          {isSupabaseConfigured() && (
+            <div className="mt-4 p-3 bg-primary/10 rounded-lg text-center">
+              <p className="text-sm text-text-secondary">
+                Connected to Supabase for secure authentication and data storage
+              </p>
+            </div>
+          )}
         </Card>
       </div>
     </div>
