@@ -14,14 +14,14 @@ export const Card = forwardRef(({
   ...props 
 }, ref) => {
   const variants = {
-    default: 'bg-surface dark:bg-dark-surface rounded-lg shadow-card border border-border dark:border-dark-border',
-    elevated: 'bg-surface dark:bg-dark-surface rounded-lg shadow-modal border border-border dark:border-dark-border',
-    flat: 'bg-surface dark:bg-dark-surface rounded-lg border border-border dark:border-dark-border',
-    outline: 'bg-transparent rounded-lg border border-border dark:border-dark-border'
+    default: 'bg-white rounded-lg shadow-sm border border-gray-200',
+    elevated: 'bg-white rounded-lg shadow-lg border border-gray-200',
+    flat: 'bg-white rounded-lg border border-gray-200',
+    outline: 'bg-transparent rounded-lg border border-gray-300'
   }
 
   const interactiveClasses = interactive 
-    ? 'cursor-pointer transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50' 
+    ? 'cursor-pointer transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-opacity-50' 
     : '';
 
   const TitleElement = titleElement;
@@ -46,15 +46,15 @@ export const Card = forwardRef(({
     >
       {/* Card Header */}
       {hasHeader && (
-        <div className="flex items-center justify-between p-6 border-b border-border dark:border-dark-border">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
             {title && (
-              <TitleElement className="text-lg font-medium text-text-primary dark:text-dark-text-primary">
+              <TitleElement className="text-lg font-medium text-gray-900">
                 {title}
               </TitleElement>
             )}
             {subtitle && (
-              <p className="mt-1 text-sm text-text-secondary dark:text-dark-text-secondary">
+              <p className="mt-1 text-sm text-gray-600">
                 {subtitle}
               </p>
             )}
@@ -72,7 +72,7 @@ export const Card = forwardRef(({
 
       {/* Card Footer */}
       {hasFooter && (
-        <div className="p-6 border-t border-border dark:border-dark-border">
+        <div className="p-6 border-t border-gray-200">
           {footer}
         </div>
       )}

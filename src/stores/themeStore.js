@@ -26,7 +26,7 @@ const applyTheme = (theme) => {
 export const useThemeStore = create(
   persist(
     (set, get) => ({
-      theme: 'system', // 'light', 'dark', or 'system'
+      theme: 'light', // 'light', 'dark', or 'system'
       
       setTheme: (theme) => {
         set({ theme })
@@ -35,6 +35,8 @@ export const useThemeStore = create(
       
       // Initialize theme on app load
       initTheme: () => {
+        // Force light mode for now
+        document.documentElement.classList.remove('dark')
         const { theme } = get()
         applyTheme(theme)
         
