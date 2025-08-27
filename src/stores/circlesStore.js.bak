@@ -168,7 +168,7 @@ const generateMockMessages = () => {
         'Just wanted to check in and see how everyone is doing.',
         'Sharing a win: I maintained my boundaries at work today!',
         'Found a great new meditation app. Happy to share if anyone is interested.',
-        'Reminder to be kind to yourself today. Progress is not always linear.'
+        'Reminder to be kind to yourself today. Progress isn't always linear.'
       ]
       
       messages.push({
