@@ -13,7 +13,8 @@ import {
   LogOut,
   ChevronDown,
   Shield,
-  Puzzle
+  Puzzle,
+  CreditCard
 } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { ThemeToggle } from './ThemeToggle'
@@ -48,6 +49,7 @@ export function AppShell({ children }) {
     { name: 'Activities', href: '/activities', icon: Activity },
     { name: 'Insights', href: '/insights', icon: Brain },
     { name: 'Circles', href: '/circles', icon: Users },
+    { name: 'Pricing', href: '/pricing', icon: CreditCard },
   ]
 
   const toggleMobileMenu = () => {
