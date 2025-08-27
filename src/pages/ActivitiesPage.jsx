@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card } from '../components/Card'
 import { Button } from '../components/Button'
 import { Modal } from '../components/Modal'
 import { Input } from '../components/Input'
 import { useDataStore } from '../stores/dataStore'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { 
   Play, 
   Clock, 
@@ -20,11 +20,21 @@ import {
 
 export function ActivitiesPage() {
   const { activities, addActivityLog } = useDataStore()
+  const location = useLocation()
   const [selectedActivity, setSelectedActivity] = useState(null)
   const [showActivity, setShowActivity] = useState(false)
   const [rating, setRating] = useState(0)
   const [feedback, setFeedback] = useState('')
   const [filter, setFilter] = useState('all')
+
+  // Set initial filter from URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search)
+    const filterParam = urlParams.get('filter')
+    if (filterParam && ['mindfulness', 'gratitude', 'cognitive', 'relaxation'].includes(filterParam)) {
+      setFilter(filterParam)
+    }
+  }, [location.search])
 
   const activityTypes = {
     mindfulness: { icon: Brain, color: 'text-blue-500', label: 'Mindfulness' },

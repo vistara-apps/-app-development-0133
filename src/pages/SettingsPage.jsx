@@ -10,6 +10,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { AISettings } from '../components/AISettings';
 import { PrivacyConsent } from '../components/PrivacyConsent';
+import { SubscriptionSettings } from '../components/SubscriptionSettings';
 import { useAuthStore } from '../stores/authStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { 
@@ -22,14 +23,15 @@ import {
   Sun,
   LogOut,
   Download,
-  Trash2
+  Trash2,
+  CreditCard
 } from 'lucide-react';
 
 export function SettingsPage() {
   const { user } = useAuthStore();
   const { theme, updateTheme } = useSettingsStore();
   
-  const [activeTab, setActiveTab] = useState('ai');
+  const [activeTab, setActiveTab] = useState('subscription');
   
   // Toggle dark mode
   const toggleDarkMode = () => {
@@ -41,6 +43,7 @@ export function SettingsPage() {
   // Render tabs
   const renderTabs = () => {
     const tabs = [
+      { id: 'subscription', label: 'Subscription', icon: CreditCard },
       { id: 'ai', label: 'AI Copilot', icon: Brain },
       { id: 'privacy', label: 'Privacy', icon: Shield },
       { id: 'notifications', label: 'Notifications', icon: Bell },
@@ -321,9 +324,16 @@ export function SettingsPage() {
     );
   };
   
+  // Render subscription tab
+  const renderSubscriptionTab = () => {
+    return <SubscriptionSettings />;
+  };
+
   // Render active tab content
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'subscription':
+        return renderSubscriptionTab();
       case 'ai':
         return renderAITab();
       case 'privacy':
@@ -333,7 +343,7 @@ export function SettingsPage() {
       case 'account':
         return renderAccountTab();
       default:
-        return renderAITab();
+        return renderSubscriptionTab();
     }
   };
   

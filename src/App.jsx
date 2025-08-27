@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { HomePage } from './pages/HomePage'
 import { DashboardPage } from './pages/DashboardPage'
@@ -9,18 +9,21 @@ import { CirclesPage } from './pages/CirclesPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { PrivacySettingsPage } from './pages/PrivacySettingsPage'
 import { IntegrationsPage } from './pages/IntegrationsPage'
+import { PricingPage } from './pages/PricingPage'
 import { AuthPage } from './pages/AuthPage'
 import { OnboardingPage } from './pages/OnboardingPage'
 import { useAuthStore } from './stores/authStore'
 import { useSettingsStore } from './stores/settingsStore'
 import { PrivacyConsent } from './components/PrivacyConsent'
 import { NudgeNotification } from './components/NudgeNotification'
+import { PaymentModal } from './components/PaymentModal'
 import { useContextualNudges } from './hooks/useContextualNudges'
 
 function App() {
   const { isAuthenticated, user } = useAuthStore()
   const { features } = useSettingsStore()
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false)
+  const navigate = useNavigate()
   
   // Force clear theme storage and ensure light mode
   useEffect(() => {
@@ -54,6 +57,39 @@ function App() {
     setShowPrivacyConsent(false);
   };
 
+  // Handle nudge action with navigation
+  const handleNudgeAction = (nudgeId, details) => {
+    // First mark the nudge as actioned
+    markNudgeAsActioned(nudgeId, details);
+    
+    // Then navigate based on nudge type
+    if (currentNudge) {
+      switch (currentNudge.type) {
+        case 'breathing':
+        case 'mindfulness':
+          navigate('/activities?filter=mindfulness');
+          break;
+        case 'gratitude':
+          navigate('/activities?filter=gratitude');
+          break;
+        case 'perspective':
+          navigate('/activities?filter=cognitive');
+          break;
+        case 'activity':
+        case 'break':
+        case 'recovery':
+          navigate('/activities?filter=relaxation');
+          break;
+        case 'social':
+          navigate('/circles');
+          break;
+        default:
+          navigate('/activities');
+          break;
+      }
+    }
+  };
+
   if (!isAuthenticated) {
     return <AuthPage />
   }
@@ -83,6 +119,7 @@ function App() {
           <Route path="/activities" element={<ActivitiesPage />} />
           <Route path="/insights" element={<InsightsPage />} />
           <Route path="/circles" element={<CirclesPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
           <Route path="/integrations" element={<IntegrationsPage />} />
@@ -96,12 +133,15 @@ function App() {
         <NudgeNotification
           nudge={currentNudge}
           onView={markNudgeAsViewed}
-          onAction={markNudgeAsActioned}
+          onAction={handleNudgeAction}
           onDismiss={dismissNudge}
           position="bottom-right"
           autoHide={true}
         />
       )}
+
+      {/* Payment Modal */}
+      <PaymentModal />
     </>
   )
 }
