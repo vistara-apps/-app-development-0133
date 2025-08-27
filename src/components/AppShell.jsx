@@ -13,7 +13,8 @@ import {
   LogOut,
   ChevronDown,
   Shield,
-  Puzzle
+  Puzzle,
+  CreditCard
 } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { ThemeToggle } from './ThemeToggle'
@@ -48,6 +49,7 @@ export function AppShell({ children }) {
     { name: 'Activities', href: '/activities', icon: Activity },
     { name: 'Insights', href: '/insights', icon: Brain },
     { name: 'Circles', href: '/circles', icon: Users },
+    { name: 'Pricing', href: '/pricing', icon: CreditCard },
   ]
 
   const toggleMobileMenu = () => {
@@ -61,16 +63,16 @@ export function AppShell({ children }) {
   return (
     <div className="min-h-screen bg-bg dark:bg-dark-bg">
       {/* Header */}
-      <header className={`sticky top-0 z-30 bg-surface dark:bg-dark-surface border-b border-border dark:border-dark-border transition-shadow ${
-        scrolled ? 'shadow-card' : ''
+      <header className={`sticky top-0 z-30 bg-white border-b border-gray-200 transition-shadow ${
+        scrolled ? 'shadow-sm' : ''
       }`}>
-        <div className="container">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               {/* Mobile menu button */}
               <button
                 type="button"
-                className="md:hidden p-2 mr-2 rounded-md text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                className="md:hidden p-2 mr-3 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 onClick={toggleMobileMenu}
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-menu"
@@ -84,20 +86,20 @@ export function AppShell({ children }) {
               </button>
               
               {/* Logo */}
-              <Link to="/" className="text-xl font-bold text-primary">
+              <Link to="/" className="text-xl font-bold text-blue-600 hover:text-blue-700">
                 ResilientFlow
               </Link>
               
               {/* Desktop navigation */}
-              <nav className="hidden md:flex ml-8 space-x-1">
+              <nav className="hidden md:flex ml-10 space-x-8">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     to={item.href}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       location.pathname === item.href
-                        ? 'text-primary bg-primary-light dark:bg-primary/20'
-                        : 'text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-border/50'
+                        ? 'text-blue-600 bg-blue-50'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                     aria-current={location.pathname === item.href ? 'page' : undefined}
                   >
@@ -108,7 +110,7 @@ export function AppShell({ children }) {
               </nav>
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
               {/* Theme toggle */}
               <ThemeToggle />
               
@@ -116,14 +118,14 @@ export function AppShell({ children }) {
               <div className="relative">
                 <button
                   type="button"
-                  className="flex items-center space-x-2 p-2 rounded-md text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                  className="flex items-center space-x-2 p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                   onClick={toggleUserMenu}
                   aria-expanded={userMenuOpen}
                   aria-haspopup="true"
                 >
                   <User className="w-5 h-5" aria-hidden="true" />
                   <span className="hidden sm:inline text-sm font-medium">{user?.username}</span>
-                  <span className="hidden sm:inline px-2 py-1 bg-accent/20 text-accent dark:bg-accent/10 dark:text-accent/90 rounded-sm text-xs font-medium">
+                  <span className="hidden sm:inline px-2 py-1 bg-green-100 text-green-800 rounded-sm text-xs font-medium">
                     {user?.subscriptionTier}
                   </span>
                   <ChevronDown className="w-4 h-4" aria-hidden="true" />
@@ -132,7 +134,7 @@ export function AppShell({ children }) {
                 {/* User dropdown menu */}
                 {userMenuOpen && (
                   <div 
-                    className="absolute right-0 mt-2 w-48 bg-surface dark:bg-dark-surface rounded-md shadow-lg border border-border dark:border-dark-border py-1 z-50"
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="user-menu"
