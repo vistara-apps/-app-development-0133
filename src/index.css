@@ -2,69 +2,183 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  * {
-    box-sizing: border-box;
-  }
-  
-  html {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: rgb(248 250 252);
-    color: rgb(15 23 42);
-    line-height: 1.5;
-  }
-  
-  /* Focus styles for accessibility */
-  :focus-visible {
-    outline: 2px solid rgb(59 130 246);
-    outline-offset: 2px;
-  }
-  
-  /* Headings */
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
-    color: rgb(15 23 42);
-  }
-  
-  /* Form elements */
-  input, textarea, select {
-    @apply bg-white border border-gray-300 rounded-md px-3 py-2 text-gray-900;
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
-    @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
-  }
+* {
+  box-sizing: border-box;
 }
 
-@layer components {
-  .container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6;
-  }
-  
-  /* Consistent spacing for sections */
-  .section-spacing {
-    @apply py-6 md:py-8;
-  }
-  
-  /* Card styles */
-  .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
-  }
-  
-  /* Button base styles */
-  .btn {
-    @apply inline-flex items-center justify-center rounded-md font-medium;
-    @apply transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500;
-    @apply disabled:cursor-not-allowed;
-  }
-  
-  /* Accessibility helper classes */
-  .sr-only {
-    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
-  }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  color: #0f172a;
+  line-height: 1.5;
+}
+
+/* Force remove any dark mode classes */
+.dark, [class*="dark"] {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* Navigation styling */
+nav {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+nav a {
+  color: #64748b !important;
+  text-decoration: none;
+}
+
+nav a:hover,
+nav a.active {
+  color: #3b82f6 !important;
+  background-color: #f1f5f9 !important;
+}
+
+/* Card styling */
+.card, [class*="card"] {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  padding: 1.5rem !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+/* Button styling */
+button, .btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+button:disabled, .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary buttons */
+.bg-primary, button[class*="primary"] {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+.bg-primary:hover, button[class*="primary"]:hover {
+  background-color: #2563eb !important;
+}
+
+/* Secondary buttons */
+.bg-secondary, button[class*="secondary"] {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.bg-secondary:hover, button[class*="secondary"]:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Form elements */
+input, textarea, select {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: #0f172a !important;
+  font-size: 0.875rem;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Text colors */
+.text-primary {
+  color: #0f172a !important;
+}
+
+.text-secondary {
+  color: #64748b !important;
+}
+
+.text-muted {
+  color: #94a3b8 !important;
+}
+
+/* Background colors */
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+.bg-gray-50 {
+  background-color: #f8fafc !important;
+}
+
+.bg-gray-100 {
+  background-color: #f1f5f9 !important;
+}
+
+/* Utility classes */
+.shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.border {
+  border: 1px solid #e2e8f0 !important;
+}
+
+.border-gray-200 {
+  border-color: #e5e7eb !important;
+}
+
+.rounded {
+  border-radius: 0.375rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+/* Status indicators */
+.bg-green-100 {
+  background-color: #dcfce7 !important;
+}
+
+.text-green-800 {
+  color: #166534 !important;
+}
+
+.bg-blue-100 {
+  background-color: #dbeafe !important;
+}
+
+.text-blue-800 {
+  color: #1e40af !important;
+}
+
+.bg-red-100 {
+  background-color: #fee2e2 !important;
+}
+
+.text-red-800 {
+  color: #991b1b !important;
 }

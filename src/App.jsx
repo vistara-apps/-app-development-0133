@@ -22,6 +22,12 @@ function App() {
   const { features } = useSettingsStore()
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false)
   
+  // Force clear theme storage and ensure light mode
+  useEffect(() => {
+    localStorage.removeItem('resilient-flow-theme')
+    document.documentElement.classList.remove('dark')
+  }, [])
+  
   // Initialize contextual nudges if enabled
   const { 
     currentNudge, 
