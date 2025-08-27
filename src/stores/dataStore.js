@@ -28,15 +28,19 @@ const generateMockActivities = () => [
     description: 'A 5-minute guided breathing exercise to center yourself',
     type: 'mindfulness',
     guideContent: 'Find a comfortable position. Close your eyes and focus on your breath...',
-    targetEmotion: 'calm'
+    targetEmotion: 'calm',
+    score: 15,
+    category: 'wellness'
   },
   {
     activityId: 'activity-2',
     name: 'Gratitude Journal',
-    description: 'Write down three things you\'re grateful for today',
+    description: 'Write down three things you are grateful for today',
     type: 'gratitude',
-    guideContent: 'Think about your day and identify three things, big or small, that you\'re grateful for...',
-    targetEmotion: 'positive'
+    guideContent: 'Think about your day and identify three things, big or small, that you are grateful for...',
+    targetEmotion: 'positive',
+    score: 25,
+    category: 'high-impact'
   },
   {
     activityId: 'activity-3',
@@ -44,7 +48,9 @@ const generateMockActivities = () => [
     description: 'Challenge negative thoughts with a more balanced perspective',
     type: 'cognitive',
     guideContent: 'Identify a negative thought. Ask yourself: Is this thought helpful? What evidence supports or contradicts it?',
-    targetEmotion: 'balanced'
+    targetEmotion: 'balanced',
+    score: 20,
+    category: 'wellness'
   },
   {
     activityId: 'activity-4',
@@ -52,7 +58,79 @@ const generateMockActivities = () => [
     description: 'Release physical tension through systematic muscle relaxation',
     type: 'relaxation',
     guideContent: 'Starting with your toes, tense each muscle group for 5 seconds, then release...',
-    targetEmotion: 'relaxed'
+    targetEmotion: 'relaxed',
+    score: 15,
+    category: 'wellness'
+  },
+  {
+    activityId: 'activity-5',
+    name: 'Family Time',
+    description: 'Spend quality time connecting with family members',
+    type: 'social',
+    guideContent: 'Engage in meaningful conversation, play games, or share a meal together without distractions...',
+    targetEmotion: 'connected',
+    score: 30,
+    category: 'high-impact'
+  },
+  {
+    activityId: 'activity-6',
+    name: 'Me Time',
+    description: 'Dedicated time for personal reflection and self-care',
+    type: 'self-care',
+    guideContent: 'Take 30 minutes for yourself. Read, take a bath, meditate, or do something you enjoy...',
+    targetEmotion: 'refreshed',
+    score: 25,
+    category: 'high-impact'
+  },
+  {
+    activityId: 'activity-7',
+    name: 'Nature Walk',
+    description: 'Take a peaceful walk in nature to reconnect and recharge',
+    type: 'physical',
+    guideContent: 'Find a nearby park, trail, or green space. Walk mindfully, observing the sights and sounds around you...',
+    targetEmotion: 'energized',
+    score: 20,
+    category: 'wellness'
+  },
+  {
+    activityId: 'activity-8',
+    name: 'Learning',
+    description: 'Engage in learning something new or developing a skill',
+    type: 'growth',
+    guideContent: 'Choose a topic that interests you. Read, watch educational content, or practice a new skill for 20-30 minutes...',
+    targetEmotion: 'accomplished',
+    score: 15,
+    category: 'wellness'
+  },
+  {
+    activityId: 'activity-9',
+    name: 'Cooking',
+    description: 'Prepare a healthy, mindful meal with intention',
+    type: 'creative',
+    guideContent: 'Choose a recipe you enjoy. Focus on the process, the ingredients, and the joy of creating something nourishing...',
+    targetEmotion: 'satisfied',
+    score: 15,
+    category: 'wellness'
+  },
+  {
+    activityId: 'activity-10',
+    name: 'Work Out',
+    description: 'Physical exercise to boost mood and energy levels',
+    type: 'physical',
+    guideContent: 'Choose any form of exercise you enjoy - yoga, running, strength training, or dancing. Aim for 20-30 minutes...',
+    targetEmotion: 'energetic',
+    score: 20,
+    category: 'wellness'
+  },
+  {
+    activityId: 'activity-11',
+    name: 'Social Meetup',
+    description: 'Connect with friends or community members in person',
+    type: 'social',
+    guideContent: 'Meet with friends, join a community group, or attend a social event. Focus on genuine connection...',
+    targetEmotion: 'connected',
+    score: 30,
+    category: 'high-impact'
   }
 ]
 
@@ -85,6 +163,7 @@ export const useDataStore = create((set, get) => ({
   activities: generateMockActivities(),
   activityLogs: generateMockActivityLogs(),
   insights: [],
+  emotionalScore: 0,
   
   addDailyEntry: (entry) => set((state) => ({
     dailyEntries: [...state.dailyEntries, {
@@ -128,5 +207,53 @@ export const useDataStore = create((set, get) => ({
     }
     
     return streak
+  },
+
+  // Calculate emotional score based on activities and check-ins
+  calculateEmotionalScore: () => {
+    const state = get()
+    const recentLogs = state.activityLogs.filter(log => {
+      const logDate = new Date(log.completionDate)
+      const weekAgo = subDays(new Date(), 7)
+      return logDate >= weekAgo
+    })
+    
+    // Base score from completed activities
+    const activityScore = recentLogs.reduce((total, log) => {
+      const activity = state.activities.find(a => a.activityId === log.activityId)
+      return total + (activity?.score || 0)
+    }, 0)
+    
+    // Bonus for consistency (streak multiplier)
+    const streak = state.getActivityCompletionStreak()
+    const consistencyBonus = Math.min(streak * 2, 50) // Max 50 bonus points
+    
+    // Recent emotional state bonus
+    const recentEntries = state.getRecentEntries(7)
+    const positiveEntries = recentEntries.filter(entry => 
+      entry.emotionalState === 'positive' || 
+      (entry.primaryEmotion && ['joyful', 'grateful', 'inspired', 'calm', 'confident'].includes(entry.primaryEmotion))
+    )
+    const emotionalBonus = positiveEntries.length * 5
+    
+    const totalScore = activityScore + consistencyBonus + emotionalBonus
+    
+    set({ emotionalScore: totalScore })
+    return totalScore
+  },
+
+  // Get missed activities penalty
+  getMissedActivitiesPenalty: () => {
+    // Calculate days without activities in the last week
+    const logs = get().activityLogs
+    let missedDays = 0
+    
+    for (let i = 0; i < 7; i++) {
+      const date = format(subDays(new Date(), i), 'yyyy-MM-dd')
+      const hasActivity = logs.some(log => log.completionDate === date)
+      if (!hasActivity) missedDays++
+    }
+    
+    return missedDays * 10 // 10 points penalty per missed day
   }
 }))

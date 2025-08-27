@@ -12,14 +12,17 @@ import {
   Activity,
   AlertCircle,
   Check,
-  Info
+  Info,
+  Zap
 } from 'lucide-react'
 
 export function HomePage() {
   const { 
     getTodayEntry, 
     getActivityCompletionStreak,
-    activityLogs 
+    activityLogs,
+    calculateEmotionalScore,
+    emotionalScore
   } = useDataStore()
   
   const [showStressInfo, setShowStressInfo] = useState(false)
@@ -52,10 +55,16 @@ export function HomePage() {
     }
   }, [todayEntry, isAnalyzing, analyzeCurrentEntry]);
   
+  // Calculate emotional score on component load
+  useEffect(() => {
+    calculateEmotionalScore();
+  }, [calculateEmotionalScore]);
+
   // Handle check-in completion
   const handleCheckInComplete = (entryData) => {
     // In a real implementation, this would trigger stress analysis
     // and potentially generate contextual nudges
+    calculateEmotionalScore(); // Recalculate score after check-in
     console.log('Check-in completed:', entryData);
   };
 
@@ -72,7 +81,7 @@ export function HomePage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid md:grid-cols-4 gap-6">
+      <div className="grid md:grid-cols-5 gap-6">
         <Card className="p-6 text-center">
           <Award className="w-8 h-8 text-accent mx-auto mb-2" />
           <div className="text-2xl font-bold text-text-primary">{streak}</div>
@@ -91,6 +100,12 @@ export function HomePage() {
             {todayEntry ? '✓' : '○'}
           </div>
           <div className="text-sm text-text-secondary">Daily Check-in</div>
+        </Card>
+        
+        <Card className="p-6 text-center bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+          <Zap className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+          <div className="text-2xl font-bold text-blue-700">{emotionalScore}</div>
+          <div className="text-sm text-blue-600">Emotional Score</div>
         </Card>
         
         {stressDetected && (
