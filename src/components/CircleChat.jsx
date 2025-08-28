@@ -25,6 +25,14 @@ export function CircleChat({ circleId }) {
     
     sendMessage(circleId, messageText)
     setMessageText('')
+    
+    // Force scroll to top after message is sent
+    setTimeout(() => {
+      const chatContainer = document.querySelector('[data-chat-container]')
+      if (chatContainer) {
+        chatContainer.scrollTop = 0
+      }
+    }, 100)
   }
   
   const handleKeyDown = (e) => {
@@ -47,7 +55,7 @@ export function CircleChat({ circleId }) {
   return (
     <div className="flex flex-col h-[600px]">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+      <div className="flex-1 overflow-y-auto mb-4 space-y-4" data-chat-container>
         {Object.entries(groupedMessages).map(([date, dateMessages]) => (
           <div key={date} className="space-y-4">
             <div className="flex items-center justify-center">

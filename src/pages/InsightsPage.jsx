@@ -7,7 +7,7 @@ import { useAuthStore } from '../stores/authStore'
 import { useCirclesStore } from '../stores/circlesStore'
 import { useSettingsStore } from '../stores/settingsStore'
 import { getMockInsights, getMockWeeklyReport } from '../services/InsightGenerator'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { 
   Brain, 
   TrendingUp, 
@@ -29,6 +29,7 @@ export function InsightsPage() {
   const { user } = useAuthStore()
   const { getUserCircles } = useCirclesStore()
   const { features } = useSettingsStore()
+  const navigate = useNavigate()
   const [insights, setInsights] = useState([])
   const [weeklyReport, setWeeklyReport] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -46,10 +47,15 @@ export function InsightsPage() {
     }
   }, [isPremium])
 
+  // Handle upgrade navigation
+  const handleUpgradeNavigation = () => {
+    navigate('/pricing')
+  }
+
   // Generate personalized insights
   const generatePersonalizedInsights = async () => {
     if (!isPremium) {
-      setShowUpgrade(true)
+      handleUpgradeNavigation()
       return
     }
 
@@ -85,7 +91,7 @@ export function InsightsPage() {
   // Generate weekly report
   const generateWeeklyReport = async () => {
     if (!isPremium) {
-      setShowUpgrade(true)
+      handleUpgradeNavigation()
       return
     }
     
@@ -203,7 +209,7 @@ export function InsightsPage() {
                   Get personalized recommendations and pattern analysis with Premium
                 </p>
               </div>
-              <Button onClick={() => setShowUpgrade(true)}>
+              <Button onClick={handleUpgradeNavigation}>
                 Upgrade to Premium
               </Button>
             </div>
@@ -332,7 +338,7 @@ export function InsightsPage() {
                   Get comprehensive weekly analysis and personalized recommendations with Premium
                 </p>
               </div>
-              <Button onClick={() => setShowUpgrade(true)}>
+              <Button onClick={handleUpgradeNavigation}>
                 Upgrade to Premium
               </Button>
             </div>

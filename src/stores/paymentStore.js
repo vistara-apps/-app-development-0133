@@ -10,7 +10,7 @@ export const usePaymentStore = create((set, get) => ({
   
   // UI state
   isProcessingPayment: false,
-  showPaymentModal: false,
+  isPaymentModalOpen: false,
   selectedPlan: null,
   paymentError: null,
   
@@ -26,12 +26,12 @@ export const usePaymentStore = create((set, get) => ({
   setProcessingPayment: (processing) => set({ isProcessingPayment: processing }),
   
   showPaymentModal: (planId = null) => set({ 
-    showPaymentModal: true, 
+    isPaymentModalOpen: true, 
     selectedPlan: planId ? SUBSCRIPTION_PLANS[planId] : null 
   }),
   
   hidePaymentModal: () => set({ 
-    showPaymentModal: false, 
+    isPaymentModalOpen: false, 
     selectedPlan: null,
     paymentError: null 
   }),
@@ -76,7 +76,7 @@ export const usePaymentStore = create((set, get) => ({
             nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
           },
           subscriptionStatus: 'active',
-          showPaymentModal: false,
+          isPaymentModalOpen: false,
           selectedPlan: null
         });
         

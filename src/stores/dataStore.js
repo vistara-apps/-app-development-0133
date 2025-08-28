@@ -22,115 +22,131 @@ const generateMockEntries = () => {
 }
 
 const generateMockActivities = () => [
+  // Mindfulness Category
   {
     activityId: 'activity-1',
     name: 'Mindful Breathing',
     description: 'A 5-minute guided breathing exercise to center yourself',
     type: 'mindfulness',
+    category: 'Mindfulness',
     guideContent: 'Find a comfortable position. Close your eyes and focus on your breath...',
     targetEmotion: 'calm',
     score: 15,
-    category: 'wellness'
+    resilientCategory: 'mindfulness'
   },
   {
-    activityId: 'activity-2',
-    name: 'Gratitude Journal',
-    description: 'Write down three things you are grateful for today',
-    type: 'gratitude',
-    guideContent: 'Think about your day and identify three things, big or small, that you are grateful for...',
-    targetEmotion: 'positive',
+    activityId: 'activity-6',
+    name: 'Me Time',
+    description: 'Dedicated time for personal reflection and self-care',
+    type: 'mindfulness',
+    category: 'Mindfulness',
+    guideContent: 'Take 30 minutes for yourself. Read, take a bath, meditate, or do something you enjoy...',
+    targetEmotion: 'refreshed',
     score: 25,
-    category: 'high-impact'
+    resilientCategory: 'mindfulness'
   },
   {
-    activityId: 'activity-3',
-    name: 'Cognitive Reframing',
-    description: 'Challenge negative thoughts with a more balanced perspective',
-    type: 'cognitive',
-    guideContent: 'Identify a negative thought. Ask yourself: Is this thought helpful? What evidence supports or contradicts it?',
-    targetEmotion: 'balanced',
-    score: 20,
-    category: 'wellness'
+    activityId: 'activity-8',
+    name: 'Learning',
+    description: 'Engage in learning something new or developing a skill',
+    type: 'mindfulness',
+    category: 'Mindfulness',
+    guideContent: 'Choose a topic that interests you. Read, watch educational content, or practice a new skill for 20-30 minutes...',
+    targetEmotion: 'accomplished',
+    score: 15,
+    resilientCategory: 'mindfulness'
+  },
+  {
+    activityId: 'activity-9',
+    name: 'Cooking',
+    description: 'Prepare a healthy, mindful meal with intention',
+    type: 'mindfulness',
+    category: 'Mindfulness',
+    guideContent: 'Choose a recipe you enjoy. Focus on the process, the ingredients, and the joy of creating something nourishing...',
+    targetEmotion: 'satisfied',
+    score: 15,
+    resilientCategory: 'mindfulness'
   },
   {
     activityId: 'activity-4',
     name: 'Progressive Muscle Relaxation',
     description: 'Release physical tension through systematic muscle relaxation',
-    type: 'relaxation',
+    type: 'mindfulness',
+    category: 'Mindfulness',
     guideContent: 'Starting with your toes, tense each muscle group for 5 seconds, then release...',
     targetEmotion: 'relaxed',
     score: 15,
-    category: 'wellness'
+    resilientCategory: 'mindfulness'
+  },
+
+  // Social Category
+  {
+    activityId: 'activity-11',
+    name: 'Social Meetup',
+    description: 'Connect with friends or community members in person',
+    type: 'social',
+    category: 'Social',
+    guideContent: 'Meet with friends, join a community group, or attend a social event. Focus on genuine connection...',
+    targetEmotion: 'connected',
+    score: 30,
+    resilientCategory: 'social'
   },
   {
     activityId: 'activity-5',
     name: 'Family Time',
     description: 'Spend quality time connecting with family members',
     type: 'social',
+    category: 'Social',
     guideContent: 'Engage in meaningful conversation, play games, or share a meal together without distractions...',
     targetEmotion: 'connected',
     score: 30,
-    category: 'high-impact'
-  },
-  {
-    activityId: 'activity-6',
-    name: 'Me Time',
-    description: 'Dedicated time for personal reflection and self-care',
-    type: 'self-care',
-    guideContent: 'Take 30 minutes for yourself. Read, take a bath, meditate, or do something you enjoy...',
-    targetEmotion: 'refreshed',
-    score: 25,
-    category: 'high-impact'
-  },
-  {
-    activityId: 'activity-7',
-    name: 'Nature Walk',
-    description: 'Take a peaceful walk in nature to reconnect and recharge',
-    type: 'physical',
-    guideContent: 'Find a nearby park, trail, or green space. Walk mindfully, observing the sights and sounds around you...',
-    targetEmotion: 'energized',
-    score: 20,
-    category: 'wellness'
-  },
-  {
-    activityId: 'activity-8',
-    name: 'Learning',
-    description: 'Engage in learning something new or developing a skill',
-    type: 'growth',
-    guideContent: 'Choose a topic that interests you. Read, watch educational content, or practice a new skill for 20-30 minutes...',
-    targetEmotion: 'accomplished',
-    score: 15,
-    category: 'wellness'
-  },
-  {
-    activityId: 'activity-9',
-    name: 'Cooking',
-    description: 'Prepare a healthy, mindful meal with intention',
-    type: 'creative',
-    guideContent: 'Choose a recipe you enjoy. Focus on the process, the ingredients, and the joy of creating something nourishing...',
-    targetEmotion: 'satisfied',
-    score: 15,
-    category: 'wellness'
+    resilientCategory: 'social'
   },
   {
     activityId: 'activity-10',
     name: 'Work Out',
     description: 'Physical exercise to boost mood and energy levels',
-    type: 'physical',
+    type: 'social',
+    category: 'Social',
     guideContent: 'Choose any form of exercise you enjoy - yoga, running, strength training, or dancing. Aim for 20-30 minutes...',
     targetEmotion: 'energetic',
     score: 20,
-    category: 'wellness'
+    resilientCategory: 'social'
   },
   {
-    activityId: 'activity-11',
-    name: 'Social Meetup',
-    description: 'Connect with friends or community members in person',
+    activityId: 'activity-7',
+    name: 'Nature Walk',
+    description: 'Take a peaceful walk in nature to reconnect and recharge',
     type: 'social',
-    guideContent: 'Meet with friends, join a community group, or attend a social event. Focus on genuine connection...',
-    targetEmotion: 'connected',
-    score: 30,
-    category: 'high-impact'
+    category: 'Social',
+    guideContent: 'Find a nearby park, trail, or green space. Walk mindfully, observing the sights and sounds around you...',
+    targetEmotion: 'energized',
+    score: 20,
+    resilientCategory: 'social'
+  },
+
+  // Journaling Category
+  {
+    activityId: 'activity-2',
+    name: 'Gratitude Journal',
+    description: 'Write down three things you are grateful for today',
+    type: 'journaling',
+    category: 'Journaling',
+    guideContent: 'Think about your day and identify three things, big or small, that you are grateful for...',
+    targetEmotion: 'positive',
+    score: 25,
+    resilientCategory: 'journaling'
+  },
+  {
+    activityId: 'activity-3',
+    name: 'Cognitive Reframing',
+    description: 'Challenge negative thoughts with a more balanced perspective',
+    type: 'journaling',
+    category: 'Journaling',
+    guideContent: 'Identify a negative thought. Ask yourself: Is this thought helpful? What evidence supports or contradicts it?',
+    targetEmotion: 'balanced',
+    score: 20,
+    resilientCategory: 'journaling'
   }
 ]
 

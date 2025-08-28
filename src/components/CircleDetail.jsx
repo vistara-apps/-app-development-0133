@@ -26,7 +26,8 @@ export function CircleDetail({ circleId, onBack }) {
     getCircleMembers, 
     getUserMembership,
     updateCirclePrompt,
-    leaveCircle
+    leaveCircle,
+    deleteCircle
   } = useCirclesStore()
   
   const [activeTab, setActiveTab] = useState('chat')
@@ -63,6 +64,13 @@ export function CircleDetail({ circleId, onBack }) {
   const handleLeaveCircle = () => {
     leaveCircle(circleId)
     onBack()
+  }
+
+  const handleDeleteCircle = () => {
+    if (window.confirm('Are you sure you want to delete this circle? This action cannot be undone.')) {
+      deleteCircle(circleId)
+      onBack()
+    }
   }
   
   return (
@@ -120,11 +128,20 @@ export function CircleDetail({ circleId, onBack }) {
           <div className="space-y-4">
             <PrivacyToggle circleId={circleId} />
             
-            <div className="pt-4 border-t border-border dark:border-dark-border">
+            <div className="pt-4 border-t border-border dark:border-dark-border space-y-3">
+              {isAdmin && (
+                <Button 
+                  variant="secondary" 
+                  onClick={handleDeleteCircle}
+                  className="text-error w-full"
+                >
+                  Delete Circle
+                </Button>
+              )}
               <Button 
                 variant="secondary" 
                 onClick={handleLeaveCircle}
-                className="text-error"
+                className="text-error w-full"
               >
                 Leave Circle
               </Button>

@@ -9,7 +9,7 @@ import { TrendingUp, Calendar, Activity, Target, Users, ArrowRight } from 'lucid
 import { Link } from 'react-router-dom'
 
 export function DashboardPage() {
-  const { dailyEntries, activityLogs, getRecentEntries } = useDataStore()
+  const { dailyEntries, activityLogs, getRecentEntries, getActivityCompletionStreak, getTodayEntry } = useDataStore()
   const { getUserCircles, getCircleMembers } = useCirclesStore()
 
   // Prepare chart data
@@ -30,12 +30,26 @@ export function DashboardPage() {
     })
   }
 
-  // Weekly progress data
+  // Calculate actual weekly progress data
+  const last7Days = []
+  for (let i = 6; i >= 0; i--) {
+    last7Days.push(format(subDays(new Date(), i), 'yyyy-MM-dd'))
+  }
+  
+  const weeklyCheckIns = dailyEntries.filter(entry => last7Days.includes(entry.date)).length
+  const weeklyActivities = activityLogs.filter(log => last7Days.includes(log.completionDate)).length
+  const mindfulnessActivities = activityLogs.filter(log => 
+    last7Days.includes(log.completionDate) && log.activity.type === 'mindfulness'
+  ).length
+  const journalingActivities = activityLogs.filter(log => 
+    last7Days.includes(log.completionDate) && log.activity.type === 'journaling'
+  ).length
+
   const weeklyData = [
-    { label: 'Check-ins', progress: 85, value: '6/7' },
-    { label: 'Activities', progress: 71, value: '5/7' },
-    { label: 'Mindfulness', progress: 60, value: '3/5' },
-    { label: 'Gratitude', progress: 80, value: '4/5' }
+    { label: 'Check-ins', progress: Math.round((weeklyCheckIns / 7) * 100), value: `${weeklyCheckIns}/7` },
+    { label: 'Activities', progress: Math.round((weeklyActivities / 7) * 100), value: `${weeklyActivities}/7` },
+    { label: 'Mindfulness', progress: Math.round((mindfulnessActivities / 5) * 100), value: `${mindfulnessActivities}/5` },
+    { label: 'Journaling', progress: Math.round((journalingActivities / 5) * 100), value: `${journalingActivities}/5` }
   ]
 
   // Daily streak data
@@ -52,33 +66,37 @@ export function DashboardPage() {
     })
   }
 
+  // Calculate actual stats
+  const currentStreak = getActivityCompletionStreak()
+  const weeklyGoalProgress = Math.round((weeklyCheckIns / 7) * 100)
+  
   const stats = [
     {
       title: 'Total Check-ins',
       value: dailyEntries.length,
       icon: Calendar,
-      change: '+12%',
+      change: `${weeklyCheckIns} this week`,
       trend: 'up'
     },
     {
       title: 'Activities Completed',
       value: activityLogs.length,
       icon: Activity,
-      change: '+8%',
+      change: `${weeklyActivities} this week`,
       trend: 'up'
     },
     {
       title: 'Current Streak',
-      value: '5 days',
+      value: `${currentStreak} days`,
       icon: Target,
-      change: 'Personal best!',
+      change: currentStreak > 5 ? 'Great job!' : 'Keep going!',
       trend: 'up'
     },
     {
       title: 'Weekly Goal',
-      value: '85%',
+      value: `${weeklyGoalProgress}%`,
       icon: TrendingUp,
-      change: '6/7 days',
+      change: `${weeklyCheckIns}/7 days`,
       trend: 'up'
     }
   ]
