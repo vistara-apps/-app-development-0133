@@ -13,14 +13,21 @@ const getSystemTheme = () => {
 const applyTheme = (theme) => {
   if (typeof document === 'undefined') return
   
+  console.log('Applying theme:', theme)
   const root = document.documentElement
   const actualTheme = theme === 'system' ? getSystemTheme() : theme
   
+  console.log('Actual theme to apply:', actualTheme)
+  
   if (actualTheme === 'dark') {
     root.classList.add('dark')
+    console.log('Added dark class to html')
   } else {
     root.classList.remove('dark')
+    console.log('Removed dark class from html')
   }
+  
+  console.log('Current html classes:', root.className)
 }
 
 export const useThemeStore = create(
@@ -29,6 +36,7 @@ export const useThemeStore = create(
       theme: 'light', // 'light', 'dark', or 'system'
       
       setTheme: (theme) => {
+        console.log('setTheme called with:', theme)
         set({ theme })
         applyTheme(theme)
       },

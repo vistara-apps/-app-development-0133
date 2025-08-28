@@ -6,10 +6,18 @@ export function ThemeToggle({ className = '' }) {
   const { theme, setTheme } = useThemeStore()
   
   const handleToggle = () => {
+    console.log('Theme toggle clicked. Current theme:', theme)
     // Cycle through themes: light -> dark -> system
-    if (theme === 'light') setTheme('dark')
-    else if (theme === 'dark') setTheme('system')
-    else setTheme('light')
+    if (theme === 'light') {
+      console.log('Setting theme to dark')
+      setTheme('dark')
+    } else if (theme === 'dark') {
+      console.log('Setting theme to system')
+      setTheme('system')
+    } else {
+      console.log('Setting theme to light')
+      setTheme('light')
+    }
   }
   
   return (

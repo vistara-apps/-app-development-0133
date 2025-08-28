@@ -12,14 +12,14 @@ const BASE_X402_CONFIG = {
   // Base Sepolia testnet configuration (for testing)
   chainId: 84532,
   rpcUrl: 'https://sepolia.base.org',
-  contractAddress: process.env.VITE_BASE_PAYMENT_CONTRACT || '0x0000000000000000000000000000000000000000',
-  apiKey: process.env.VITE_BASE_API_KEY || 'demo-key'
+  contractAddress: import.meta.env.VITE_BASE_PAYMENT_CONTRACT || '0x0000000000000000000000000000000000000000',
+  apiKey: import.meta.env.VITE_BASE_API_KEY || 'demo-key'
 };
 
 // Stripe Configuration
 const STRIPE_CONFIG = {
-  publishableKey: process.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_demo',
-  apiUrl: process.env.VITE_API_URL || 'http://localhost:3001/api'
+  publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_demo',
+  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 };
 
 // Subscription Plans
@@ -36,7 +36,7 @@ export const SUBSCRIPTION_PLANS = {
       '1 support circle'
     ],
     basePrice: '0.001', // Base ETH equivalent
-    stripeProductId: process.env.VITE_STRIPE_BASIC_PRODUCT_ID || 'prod_demo_basic'
+    stripeProductId: import.meta.env.VITE_STRIPE_BASIC_PRODUCT_ID || 'prod_demo_basic'
   },
   premium: {
     id: 'premium',
@@ -52,7 +52,7 @@ export const SUBSCRIPTION_PLANS = {
       'Priority support'
     ],
     basePrice: '0.002', // Base ETH equivalent
-    stripeProductId: process.env.VITE_STRIPE_PREMIUM_PRODUCT_ID || 'prod_demo_premium'
+    stripeProductId: import.meta.env.VITE_STRIPE_PREMIUM_PRODUCT_ID || 'prod_demo_premium'
   },
   enterprise: {
     id: 'enterprise',
@@ -68,7 +68,7 @@ export const SUBSCRIPTION_PLANS = {
       'API access'
     ],
     basePrice: '0.005', // Base ETH equivalent
-    stripeProductId: process.env.VITE_STRIPE_ENTERPRISE_PRODUCT_ID || 'prod_demo_enterprise'
+    stripeProductId: import.meta.env.VITE_STRIPE_ENTERPRISE_PRODUCT_ID || 'prod_demo_enterprise'
   }
 };
 
