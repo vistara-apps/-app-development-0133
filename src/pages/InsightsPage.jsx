@@ -6,6 +6,7 @@ import { useDataStore } from '../stores/dataStore'
 import { useAuthStore } from '../stores/authStore'
 import { useCirclesStore } from '../stores/circlesStore'
 import { useSettingsStore } from '../stores/settingsStore'
+import { getInsights, getWeeklyReport, isOpenAIConfigured } from '../services/RealInsightGenerator'
 import { getMockInsights, getMockWeeklyReport } from '../services/InsightGenerator'
 import { Link, useNavigate } from 'react-router-dom'
 import { 
@@ -25,7 +26,7 @@ import {
 } from 'lucide-react'
 
 export function InsightsPage() {
-  const { dailyEntries, activityLogs } = useDataStore()
+  const { dailyEntries, activityLogs, userId } = useDataStore()
   const { user } = useAuthStore()
   const { getUserCircles } = useCirclesStore()
   const { features } = useSettingsStore()
@@ -39,13 +40,41 @@ export function InsightsPage() {
 
   const isPremium = user?.subscriptionTier === 'premium'
 
-  // Load mock insights and report on mount
+  // Load insights and report on mount
   useEffect(() => {
-    if (isPremium) {
-      setInsights(getMockInsights())
-      setWeeklyReport(getMockWeeklyReport())
+    if (isPremium || userId === 'demo-user-1') {
+      loadInsights()
+      loadWeeklyReport()
     }
-  }, [isPremium])
+  }, [isPremium, userId])
+
+  // Load insights using real AI or mock data
+  const loadInsights = async () => {
+    setIsGenerating(true)
+    try {
+      const insightsData = await getInsights(userId)
+      setInsights(insightsData)
+    } catch (error) {
+      console.error('Failed to load insights:', error)
+      setInsights(getMockInsights()) // Fallback to mock
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  // Load weekly report using real AI or mock data
+  const loadWeeklyReport = async () => {
+    setIsGeneratingReport(true)
+    try {
+      const reportData = await getWeeklyReport(userId)
+      setWeeklyReport(reportData)
+    } catch (error) {
+      console.error('Failed to load weekly report:', error)
+      setWeeklyReport(getMockWeeklyReport()) // Fallback to mock
+    } finally {
+      setIsGeneratingReport(false)
+    }
+  }
 
   // Handle upgrade navigation
   const handleUpgradeNavigation = () => {
@@ -59,33 +88,7 @@ export function InsightsPage() {
       return
     }
 
-    setIsGenerating(true)
-    
-    try {
-      // Simulate AI generation with timeout
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      const aiInsight = {
-        insightId: `insight-${Date.now()}`,
-        title: 'AI-Generated Insight',
-        content: `Based on your ${dailyEntries.length} check-ins and ${activityLogs.length} completed activities, you show strong consistency in emotional tracking. Your resilience building efforts are most effective when combined with regular mindfulness practices.`,
-        confidence: 'AI-Powered',
-        category: 'observation',
-        suggestions: [
-          'Continue your daily check-ins to build a more complete emotional profile',
-          'Try adding mindfulness activities to your routine 3-4 times per week'
-        ],
-        generatedAt: new Date().toISOString(),
-        viewed: false
-      }
-
-      setInsights([aiInsight, ...getMockInsights()])
-    } catch (error) {
-      console.error('Error generating insights:', error)
-      setInsights(getMockInsights())
-    } finally {
-      setIsGenerating(false)
-    }
+    await loadInsights()
   }
   
   // Generate weekly report
@@ -95,18 +98,7 @@ export function InsightsPage() {
       return
     }
     
-    setIsGeneratingReport(true)
-    
-    try {
-      // Simulate AI generation with timeout
-      await new Promise(resolve => setTimeout(resolve, 2500))
-      
-      setWeeklyReport(getMockWeeklyReport())
-    } catch (error) {
-      console.error('Error generating weekly report:', error)
-    } finally {
-      setIsGeneratingReport(false)
-    }
+    await loadWeeklyReport()
   }
   
   // Mark report as viewed

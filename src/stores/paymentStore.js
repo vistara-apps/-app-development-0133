@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { realPaymentManager, REAL_SUBSCRIPTION_PLANS } from '../services/RealPaymentService';
 import { paymentManager, SUBSCRIPTION_PLANS } from '../services/PaymentService';
 
 export const usePaymentStore = create((set, get) => ({
@@ -27,7 +28,7 @@ export const usePaymentStore = create((set, get) => ({
   
   showPaymentModal: (planId = null) => set({ 
     isPaymentModalOpen: true, 
-    selectedPlan: planId ? SUBSCRIPTION_PLANS[planId] : null 
+    selectedPlan: planId ? (REAL_SUBSCRIPTION_PLANS[planId] || SUBSCRIPTION_PLANS[planId]) : null 
   }),
   
   hidePaymentModal: () => set({ 
@@ -43,7 +44,15 @@ export const usePaymentStore = create((set, get) => ({
   // Initialize payment manager
   initializePayments: async (stripeInstance) => {
     try {
-      await paymentManager.initialize(stripeInstance);
+      // Try real payment service first
+      if (import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY && 
+          import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY !== 'pk_test_your_stripe_publishable_key_here') {
+        await realPaymentManager.initialize(stripeInstance);
+        set({ paymentServiceType: 'real' });
+      } else {
+        await paymentManager.initialize(stripeInstance);
+        set({ paymentServiceType: 'mock' });
+      }
       return true;
     } catch (error) {
       console.error('Failed to initialize payment manager:', error);
@@ -62,7 +71,9 @@ export const usePaymentStore = create((set, get) => ({
     set({ isProcessingPayment: true, paymentError: null });
     
     try {
-      const result = await paymentManager.processPayment(method, planId, userId, paymentData);
+      // Use real or mock payment manager based on configuration
+      const manager = state.paymentServiceType === 'real' ? realPaymentManager : paymentManager;
+      const result = await manager.processPayment(method, planId, userId, paymentData);
       
       if (result.success) {
         // Update subscription state
@@ -124,8 +135,11 @@ export const usePaymentStore = create((set, get) => ({
     try {
       let result = { success: true };
       
-      if (state.currentSubscription.method === 'stripe' && state.paymentMethod?.stripePayment) {
-        result = await state.paymentMethod.stripePayment.cancelSubscription(
+      // Use real or mock payment manager based on configuration
+      const manager = state.paymentServiceType === 'real' ? realPaymentManager : paymentManager;
+      
+      if (state.currentSubscription.method === 'stripe') {
+        result = await manager.stripePayment.cancelSubscription(
           state.currentSubscription.subscriptionId, 
           userId
         );

@@ -14,6 +14,7 @@ import { AuthPage } from './pages/AuthPage'
 import { OnboardingPage } from './pages/OnboardingPage'
 import { useAuthStore } from './stores/authStore'
 import { useSettingsStore } from './stores/settingsStore'
+import { useDataStore } from './stores/dataStore'
 import { PrivacyConsent } from './components/PrivacyConsent'
 import { NudgeNotification } from './components/NudgeNotification'
 import { PaymentModal } from './components/PaymentModal'
@@ -22,8 +23,14 @@ import { useContextualNudges } from './hooks/useContextualNudges'
 function App() {
   const { isAuthenticated, user } = useAuthStore()
   const { features } = useSettingsStore()
+  const { initialize: initializeDataStore, initialized } = useDataStore()
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false)
   const navigate = useNavigate()
+
+  // Initialize data store when app loads
+  useEffect(() => {
+    initializeDataStore()
+  }, [])
   
   
   // Initialize contextual nudges if enabled
