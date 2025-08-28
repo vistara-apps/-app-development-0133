@@ -4,6 +4,7 @@ import { Button } from '../components/Button'
 import { PulseCheck } from '../components/PulseCheck'
 import { useDataStore } from '../stores/dataStore'
 import { useStressDetection } from '../hooks/useStressDetection'
+import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { 
   Target,
@@ -22,9 +23,11 @@ export function HomePage() {
     getActivityCompletionStreak,
     activityLogs,
     calculateEmotionalScore,
-    emotionalScore
+    emotionalScore,
+    activities
   } = useDataStore()
   
+  const navigate = useNavigate()
   const [showStressInfo, setShowStressInfo] = useState(false)
   
   const todayEntry = getTodayEntry()
@@ -66,6 +69,29 @@ export function HomePage() {
     // and potentially generate contextual nudges
     calculateEmotionalScore(); // Recalculate score after check-in
     console.log('Check-in completed:', entryData);
+  };
+
+  // Handle activity navigation
+  const navigateToActivity = (activityName) => {
+    const activity = activities.find(a => a.name.toLowerCase().includes(activityName.toLowerCase()))
+    if (activity) {
+      // Navigate to activities page and trigger activity start
+      navigate(`/activities?start=${activity.activityId}`)
+    } else {
+      // Fallback to activities page with relevant filter
+      const filterMap = {
+        'progressive': 'relaxation',
+        'breathing': 'mindfulness',
+        'mindful': 'mindfulness',
+        'gratitude': 'gratitude'
+      }
+      const filter = Object.keys(filterMap).find(key => activityName.toLowerCase().includes(key))
+      navigate(`/activities${filter ? `?filter=${filterMap[filter]}` : ''}`)
+    }
+  };
+
+  const handleConnectCalendar = () => {
+    navigate('/integrations')
   };
 
   return (
@@ -167,14 +193,26 @@ export function HomePage() {
                     <div className="font-medium text-text-primary">Progressive Relaxation</div>
                     <div className="text-sm text-text-secondary">7 min - Good for stress</div>
                   </div>
-                  <Button size="sm" variant="ghost">Try Now</Button>
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    onClick={() => navigateToActivity('Progressive Relaxation')}
+                  >
+                    Try Now
+                  </Button>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                   <div>
                     <div className="font-medium text-text-primary">Breathing Exercise</div>
                     <div className="text-sm text-text-secondary">3 min - Good for stress</div>
                   </div>
-                  <Button size="sm" variant="ghost">Try Now</Button>
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    onClick={() => navigateToActivity('Mindful Breathing')}
+                  >
+                    Try Now
+                  </Button>
                 </div>
               </>
             ) : (
@@ -184,14 +222,26 @@ export function HomePage() {
                     <div className="font-medium text-text-primary">Mindful Breathing</div>
                     <div className="text-sm text-text-secondary">5 min</div>
                   </div>
-                  <Button size="sm" variant="ghost">Try Now</Button>
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    onClick={() => navigateToActivity('Mindful Breathing')}
+                  >
+                    Try Now
+                  </Button>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
                     <div className="font-medium text-text-primary">Gratitude Journal</div>
                     <div className="text-sm text-text-secondary">3 min</div>
                   </div>
-                  <Button size="sm" variant="ghost">Try Now</Button>
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    onClick={() => navigateToActivity('Gratitude Journal')}
+                  >
+                    Try Now
+                  </Button>
                 </div>
               </>
             )}
@@ -221,7 +271,11 @@ export function HomePage() {
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-text-primary">Upcoming Events</h3>
-          <Button size="sm" variant="ghost">
+          <Button 
+            size="sm" 
+            variant="ghost"
+            onClick={handleConnectCalendar}
+          >
             Connect Calendar
           </Button>
         </div>

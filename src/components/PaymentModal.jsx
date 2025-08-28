@@ -278,7 +278,7 @@ function BaseX402PaymentForm({ plan, onSuccess, onError, processing }) {
 
 export function PaymentModal() {
   const {
-    showPaymentModal,
+    isPaymentModalOpen,
     selectedPlan,
     isProcessingPayment,
     paymentError,
@@ -295,13 +295,13 @@ export function PaymentModal() {
   const availablePaymentMethods = getAvailablePaymentMethods();
   
   useEffect(() => {
-    if (showPaymentModal) {
+    if (isPaymentModalOpen) {
       initializePayments();
       setPaymentSuccess(false);
       setSuccessResult(null);
       clearPaymentError();
     }
-  }, [showPaymentModal]);
+  }, [isPaymentModalOpen]);
   
   const handlePaymentSuccess = (result) => {
     setPaymentSuccess(true);
@@ -321,13 +321,13 @@ export function PaymentModal() {
     setSuccessResult(null);
   };
   
-  if (!showPaymentModal || !selectedPlan) {
+  if (!isPaymentModalOpen || !selectedPlan) {
     return null;
   }
   
   return (
     <Modal
-      isOpen={showPaymentModal}
+      isOpen={isPaymentModalOpen}
       onClose={handleClose}
       title={paymentSuccess ? 'Payment Successful!' : `Subscribe to ${selectedPlan.name}`}
       className="max-w-2xl"

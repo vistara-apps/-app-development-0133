@@ -322,6 +322,26 @@ export const useCirclesStore = create((set, get) => ({
       )
     }
   }),
+
+  // Delete a circle (admin only)
+  deleteCircle: (circleId) => set(state => {
+    const currentUserId = useAuthStore.getState().user.userId
+    const circle = state.circles.find(c => c.circleId === circleId)
+    const userMembership = state.memberships.find(
+      m => m.circleId === circleId && m.userId === currentUserId
+    )
+    
+    // Only allow deletion if user is admin or circle creator
+    if (!circle || (!userMembership || (userMembership.role !== 'admin' && circle.createdBy !== currentUserId))) {
+      return state
+    }
+    
+    return {
+      circles: state.circles.filter(c => c.circleId !== circleId),
+      memberships: state.memberships.filter(m => m.circleId !== circleId),
+      messages: state.messages.filter(m => m.circleId !== circleId)
+    }
+  }),
   
   // Send a message to a circle
   sendMessage: (circleId, content) => set(state => {

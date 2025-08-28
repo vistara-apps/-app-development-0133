@@ -27,20 +27,28 @@ export function ActivitiesPage() {
   const [feedback, setFeedback] = useState('')
   const [filter, setFilter] = useState('all')
 
-  // Set initial filter from URL parameters
+  // Set initial filter and auto-start from URL parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search)
     const filterParam = urlParams.get('filter')
-    if (filterParam && ['mindfulness', 'gratitude', 'cognitive', 'relaxation'].includes(filterParam)) {
+    const startParam = urlParams.get('start')
+    
+    if (filterParam && ['mindfulness', 'social', 'journaling'].includes(filterParam)) {
       setFilter(filterParam)
     }
-  }, [location.search])
+    
+    if (startParam) {
+      const activity = activities.find(a => a.activityId === startParam)
+      if (activity) {
+        startActivity(activity)
+      }
+    }
+  }, [location.search, activities])
 
   const activityTypes = {
     mindfulness: { icon: Brain, color: 'text-blue-500', label: 'Mindfulness' },
-    gratitude: { icon: Heart, color: 'text-pink-500', label: 'Gratitude' },
-    cognitive: { icon: Zap, color: 'text-yellow-500', label: 'Cognitive' },
-    relaxation: { icon: Smile, color: 'text-green-500', label: 'Relaxation' }
+    social: { icon: Users, color: 'text-green-500', label: 'Social' },
+    journaling: { icon: Heart, color: 'text-pink-500', label: 'Journaling' }
   }
 
   const filteredActivities = filter === 'all' 
