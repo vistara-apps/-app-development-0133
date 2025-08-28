@@ -25,11 +25,6 @@ function App() {
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false)
   const navigate = useNavigate()
   
-  // Force clear theme storage and ensure light mode
-  useEffect(() => {
-    localStorage.removeItem('resilient-flow-theme')
-    document.documentElement.classList.remove('dark')
-  }, [])
   
   // Initialize contextual nudges if enabled
   const { 

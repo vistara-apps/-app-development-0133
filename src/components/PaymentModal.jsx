@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 // Initialize Stripe
-const stripePromise = loadStripe(process.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_demo');
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_demo');
 
 const cardElementOptions = {
   style: {

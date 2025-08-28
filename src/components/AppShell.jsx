@@ -63,7 +63,7 @@ export function AppShell({ children }) {
   return (
     <div className="min-h-screen bg-bg dark:bg-dark-bg">
       {/* Header */}
-      <header className={`sticky top-0 z-30 bg-white border-b border-gray-200 transition-shadow ${
+      <header className={`sticky top-0 z-30 bg-white dark:bg-dark-surface border-b border-gray-200 dark:border-dark-border transition-shadow ${
         scrolled ? 'shadow-sm' : ''
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
