@@ -1,5 +1,12 @@
 import { create } from 'zustand'
 import { format, subDays, startOfDay } from 'date-fns'
+import { 
+  DailyEntries, 
+  ActivityLogs, 
+  Activities, 
+  UserProfiles,
+  Auth 
+} from '../services/supabase'
 
 // Mock data generator
 const generateMockEntries = () => {
@@ -175,27 +182,143 @@ const generateMockActivityLogs = () => {
 }
 
 export const useDataStore = create((set, get) => ({
-  dailyEntries: generateMockEntries(),
-  activities: generateMockActivities(),
-  activityLogs: generateMockActivityLogs(),
+  dailyEntries: [],
+  activities: [],
+  activityLogs: [],
   insights: [],
   emotionalScore: 0,
+  userId: null,
+  initialized: false,
+
+  // Initialize store with real data from Supabase
+  initialize: async () => {
+    try {
+      const user = await Auth.getCurrentUser()
+      if (!user) {
+        // Use mock data for demo users
+        set({
+          dailyEntries: generateMockEntries(),
+          activities: generateMockActivities(),
+          activityLogs: generateMockActivityLogs(),
+          userId: 'demo-user-1',
+          initialized: true
+        })
+        return
+      }
+
+      set({ userId: user.id })
+
+      // Load real data from Supabase
+      const [dailyEntries, activities, activityLogs] = await Promise.all([
+        DailyEntries.getByUserId(user.id, 30),
+        Activities.getAll(),
+        ActivityLogs.getByUserId(user.id, 50)
+      ])
+
+      set({
+        dailyEntries: dailyEntries || [],
+        activities: activities || generateMockActivities(), // Use mock if no activities exist
+        activityLogs: activityLogs || [],
+        initialized: true
+      })
+
+      // Calculate emotional score
+      get().calculateEmotionalScore()
+
+    } catch (error) {
+      console.error('Failed to initialize data store:', error)
+      // Fallback to mock data
+      set({
+        dailyEntries: generateMockEntries(),
+        activities: generateMockActivities(),
+        activityLogs: generateMockActivityLogs(),
+        userId: 'demo-user-1',
+        initialized: true
+      })
+    }
+  },
   
-  addDailyEntry: (entry) => set((state) => ({
-    dailyEntries: [...state.dailyEntries, {
-      ...entry,
-      entryId: `entry-${Date.now()}`,
-      createdAt: new Date().toISOString()
-    }]
-  })),
+  addDailyEntry: async (entry) => {
+    try {
+      const state = get()
+      const user = await Auth.getCurrentUser()
+      
+      if (!user && state.userId === 'demo-user-1') {
+        // Mock behavior for demo
+        set((state) => ({
+          dailyEntries: [...state.dailyEntries, {
+            ...entry,
+            entryId: `entry-${Date.now()}`,
+            userId: 'demo-user-1',
+            createdAt: new Date().toISOString()
+          }]
+        }))
+        return
+      }
+
+      if (!user) throw new Error('User not authenticated')
+
+      // Save to Supabase
+      const newEntry = await DailyEntries.create({
+        user_id: user.id,
+        date: entry.date,
+        emotional_state: entry.emotionalState,
+        primary_emotion: entry.primaryEmotion,
+        stress_level: entry.stressLevel,
+        energy_level: entry.energyLevel,
+        sleep_hours: entry.sleepHours,
+        notes: entry.notes,
+        mood_triggers: entry.moodTriggers || []
+      })
+
+      set((state) => ({
+        dailyEntries: [...state.dailyEntries, newEntry]
+      }))
+
+    } catch (error) {
+      console.error('Failed to add daily entry:', error)
+      throw error
+    }
+  },
   
-  addActivityLog: (log) => set((state) => ({
-    activityLogs: [...state.activityLogs, {
-      ...log,
-      logId: `log-${Date.now()}`,
-      createdAt: new Date().toISOString()
-    }]
-  })),
+  addActivityLog: async (log) => {
+    try {
+      const state = get()
+      const user = await Auth.getCurrentUser()
+      
+      if (!user && state.userId === 'demo-user-1') {
+        // Mock behavior for demo
+        set((state) => ({
+          activityLogs: [...state.activityLogs, {
+            ...log,
+            logId: `log-${Date.now()}`,
+            userId: 'demo-user-1',
+            createdAt: new Date().toISOString()
+          }]
+        }))
+        return
+      }
+
+      if (!user) throw new Error('User not authenticated')
+
+      // Save to Supabase
+      const newLog = await ActivityLogs.create({
+        user_id: user.id,
+        activity_id: log.activityId,
+        completion_date: log.completionDate,
+        rating: log.rating,
+        feedback: log.feedback
+      })
+
+      set((state) => ({
+        activityLogs: [...state.activityLogs, newLog]
+      }))
+
+    } catch (error) {
+      console.error('Failed to add activity log:', error)
+      throw error
+    }
+  },
   
   getTodayEntry: () => {
     const today = format(new Date(), 'yyyy-MM-dd')

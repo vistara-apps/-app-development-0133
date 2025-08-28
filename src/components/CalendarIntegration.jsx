@@ -19,14 +19,10 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react';
-import { 
-  initializeCalendarIntegration,
-  getCalendars,
-  analyzeUpcomingEvents
-} from '../services/GoogleCalendarService';
+import { googleCalendar, isGoogleCalendarConfigured } from '../services/GoogleCalendarService';
 
 export function CalendarIntegration() {
-  const { googleCalendar, updateGoogleCalendar } = useSettingsStore();
+  const { googleCalendar: calendarSettings, updateGoogleCalendar } = useSettingsStore();
   
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -35,41 +31,71 @@ export function CalendarIntegration() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Check if Google Calendar is configured
+  if (!isGoogleCalendarConfigured()) {
+    return (
+      <Card className="p-6">
+        <div className="flex items-center space-x-3 mb-4">
+          <Calendar className="w-6 h-6 text-gray-400" />
+          <h3 className="text-lg font-semibold text-gray-400">Google Calendar Integration</h3>
+        </div>
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+          <AlertCircle className="w-5 h-5 text-yellow-500 mb-2" />
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Google Calendar integration is not configured. Please add your Google API keys to enable this feature.
+          </p>
+          <p className="text-xs text-gray-500 mt-2">
+            Required: VITE_GOOGLE_CLIENT_ID and VITE_GOOGLE_API_KEY
+          </p>
+        </div>
+      </Card>
+    );
+  }
   
   // Initialize connection status
   useEffect(() => {
-    setIsConnected(googleCalendar.enabled);
-    setSelectedCalendars(googleCalendar.calendarIds || ['primary']);
-  }, [googleCalendar]);
+    setIsConnected(calendarSettings.enabled);
+    setSelectedCalendars(calendarSettings.calendarIds || ['primary']);
+  }, [calendarSettings]);
   
   // Connect to Google Calendar
   const handleConnect = async () => {
     setIsConnecting(true);
     
     try {
-      const success = await initializeCalendarIntegration({
-        features: { calendarIntegration: true }
-      });
+      // Initialize the Google Calendar service
+      await googleCalendar.initialize();
       
-      if (success) {
-        setIsConnected(true);
-        updateGoogleCalendar({ enabled: true });
-        
-        // Get available calendars
-        const availableCalendars = await getCalendars();
-        setCalendars(availableCalendars);
-      }
+      // Authenticate with Google
+      await googleCalendar.authenticate();
+      
+      setIsConnected(true);
+      updateGoogleCalendar({ enabled: true });
+      
+      // Get available calendars
+      const availableCalendars = await googleCalendar.getCalendars();
+      setCalendars(availableCalendars);
+      
     } catch (error) {
       console.error('Error connecting to Google Calendar:', error);
+      alert('Failed to connect to Google Calendar. Please try again.');
     } finally {
       setIsConnecting(false);
     }
   };
   
   // Disconnect from Google Calendar
-  const handleDisconnect = () => {
-    setIsConnected(false);
-    updateGoogleCalendar({ enabled: false });
+  const handleDisconnect = async () => {
+    try {
+      await googleCalendar.signOut();
+      setIsConnected(false);
+      updateGoogleCalendar({ enabled: false });
+      setCalendars([]);
+      setUpcomingEvents([]);
+    } catch (error) {
+      console.error('Error disconnecting:', error);
+    }
   };
   
   // Toggle calendar selection
@@ -95,7 +121,7 @@ export function CalendarIntegration() {
   // Toggle feature setting
   const toggleFeature = (feature) => {
     updateGoogleCalendar({
-      [feature]: !googleCalendar[feature]
+      [feature]: !calendarSettings[feature]
     });
   };
   
@@ -106,13 +132,10 @@ export function CalendarIntegration() {
     setIsAnalyzing(true);
     
     try {
-      const analyses = await analyzeUpcomingEvents({
-        googleCalendar: {
-          calendarIds: selectedCalendars
-        }
-      });
+      // Get upcoming wellness events from Google Calendar
+      const events = await googleCalendar.getUpcomingWellnessEvents(7);
+      setUpcomingEvents(events);
       
-      setUpcomingEvents(analyses);
     } catch (error) {
       console.error('Error analyzing upcoming events:', error);
     } finally {

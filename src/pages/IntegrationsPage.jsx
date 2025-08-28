@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { CalendarIntegration } from '../components/CalendarIntegration';
+import { GoogleCalendarIntegration } from '../components/GoogleCalendarIntegration';
 import { SlackIntegration } from '../components/SlackIntegration';
 import { Card } from '../components/Card';
 import { useSettingsStore } from '../stores/settingsStore';
@@ -54,20 +55,23 @@ export function IntegrationsPage() {
         </Card>
       ) : (
         <>
+          {/* Google Calendar Integration */}
+          <GoogleCalendarIntegration />
+          
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="p-6">
               <div className="flex items-center space-x-3 mb-4">
                 <Calendar className="w-6 h-6 text-primary" />
-                <h3 className="text-lg font-medium text-text-primary">Google Calendar</h3>
+                <h3 className="text-lg font-medium text-text-primary">Legacy Calendar</h3>
               </div>
               <p className="text-text-secondary mb-4">
-                Connect your calendar for schedule-aware resilience support, including preparation for stressful events and recovery suggestions.
+                Basic calendar integration for simple scheduling support.
               </p>
               <a 
                 href="/integrations/calendar" 
                 className="text-primary hover:underline"
               >
-                Configure Calendar Integration
+                Configure Legacy Integration
               </a>
             </Card>
             
