@@ -174,7 +174,7 @@ const generateMockActivityLogs = () => {
         rating: Math.floor(Math.random() * 5) + 1,
         feedback: Math.random() > 0.7 ? 'This helped me feel more centered' : '',
         createdAt: new Date(date).toISOString(),
-        activity
+        // Remove the activity property to avoid duplication
       })
     }
   }
@@ -340,6 +340,24 @@ export const useDataStore = create((set, get) => ({
       const hasActivity = logs.some(log => log.completionDate === dateStr)
       
       if (!hasActivity) break
+      
+      streak++
+      currentDate = subDays(currentDate, 1)
+    }
+    
+    return streak
+  },
+
+  getCheckInStreak: () => {
+    const entries = get().dailyEntries
+    let streak = 0
+    let currentDate = new Date()
+    
+    while (streak < 30) {
+      const dateStr = format(currentDate, 'yyyy-MM-dd')
+      const hasEntry = entries.some(entry => entry.date === dateStr)
+      
+      if (!hasEntry) break
       
       streak++
       currentDate = subDays(currentDate, 1)

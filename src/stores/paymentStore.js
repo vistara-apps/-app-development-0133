@@ -26,10 +26,18 @@ export const usePaymentStore = create((set, get) => ({
   
   setProcessingPayment: (processing) => set({ isProcessingPayment: processing }),
   
-  showPaymentModal: (planId = null) => set({ 
-    isPaymentModalOpen: true, 
-    selectedPlan: planId ? (REAL_SUBSCRIPTION_PLANS[planId] || SUBSCRIPTION_PLANS[planId]) : null 
-  }),
+  showPaymentModal: (planId = null) => {
+    const state = get()
+    if (state.isPaymentModalOpen && state.selectedPlan?.id === planId) {
+      // Already showing this plan's modal, don't open another
+      return
+    }
+    set({ 
+      isPaymentModalOpen: true, 
+      selectedPlan: planId ? (REAL_SUBSCRIPTION_PLANS[planId] || SUBSCRIPTION_PLANS[planId]) : null,
+      paymentError: null
+    })
+  },
   
   hidePaymentModal: () => set({ 
     isPaymentModalOpen: false, 

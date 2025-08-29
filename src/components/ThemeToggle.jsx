@@ -6,29 +6,62 @@ export function ThemeToggle({ className = '' }) {
   const { theme, setTheme } = useThemeStore()
   
   const handleToggle = () => {
-    console.log('Theme toggle clicked. Current theme:', theme)
     // Cycle through themes: light -> dark -> system
     if (theme === 'light') {
-      console.log('Setting theme to dark')
       setTheme('dark')
     } else if (theme === 'dark') {
-      console.log('Setting theme to system')
       setTheme('system')
     } else {
-      console.log('Setting theme to light')
       setTheme('light')
+    }
+  }
+
+  const getIcon = () => {
+    switch (theme) {
+      case 'light':
+        return <Sun className="w-4 h-4" />
+      case 'dark':
+        return <Moon className="w-4 h-4" />
+      case 'system':
+        return <Monitor className="w-4 h-4" />
+      default:
+        return <Sun className="w-4 h-4" />
+    }
+  }
+
+  const getThemeLabel = () => {
+    switch (theme) {
+      case 'light':
+        return 'Light'
+      case 'dark':
+        return 'Dark'
+      case 'system':
+        return 'Auto'
+      default:
+        return 'Light'
     }
   }
   
   return (
     <button
       onClick={handleToggle}
-      className={`p-2 rounded-md text-text-primary dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${className}`}
+      className={`
+        inline-flex items-center gap-2 px-3 py-2 
+        rounded-lg text-sm font-medium
+        bg-white dark:bg-gray-800 
+        text-gray-700 dark:text-gray-200
+        border border-gray-300 dark:border-gray-600
+        hover:bg-gray-50 dark:hover:bg-gray-700
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900
+        transition-all duration-200 ease-in-out
+        shadow-sm hover:shadow-md
+        ${className}
+      `}
       aria-label={`Current theme: ${theme}. Click to change theme.`}
+      title={`Switch to ${theme === 'light' ? 'dark' : theme === 'dark' ? 'auto' : 'light'} mode`}
     >
-      {theme === 'light' && <Sun className="w-5 h-5" />}
-      {theme === 'dark' && <Moon className="w-5 h-5" />}
-      {theme === 'system' && <Monitor className="w-5 h-5" />}
+      {getIcon()}
+      <span className="hidden sm:inline">{getThemeLabel()}</span>
     </button>
   )
 }

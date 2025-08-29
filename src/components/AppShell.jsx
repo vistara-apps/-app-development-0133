@@ -110,7 +110,7 @@ export function AppShell({ children }) {
               </nav>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               {/* Theme toggle */}
               <ThemeToggle />
               
@@ -225,7 +225,7 @@ export function AppShell({ children }) {
       </header>
 
       {/* Main Content */}
-      <main className="container py-6 md:py-8 pb-20 md:pb-8">
+      <main className="relative flex flex-col items-center p-6 justify-center">
         {children}
       </main>
 

@@ -33,8 +33,13 @@ export function ActivitiesPage() {
     const filterParam = urlParams.get('filter')
     const startParam = urlParams.get('start')
     
-    if (filterParam && ['mindfulness', 'social', 'journaling'].includes(filterParam)) {
-      setFilter(filterParam)
+    if (filterParam && ['mindfulness', 'social', 'journaling', 'relaxation', 'gratitude'].includes(filterParam)) {
+      // Map alternative filter names to standard ones
+      const filterMap = {
+        'relaxation': 'mindfulness',
+        'gratitude': 'journaling'
+      }
+      setFilter(filterMap[filterParam] || filterParam)
     }
     
     if (startParam) {

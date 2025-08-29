@@ -52,7 +52,7 @@ export function DashboardPage() {
     { label: 'Journaling', progress: Math.round((journalingActivities / 5) * 100), value: `${journalingActivities}/5` }
   ]
 
-  // Daily streak data
+  // Daily streak data - actual check-in status
   const dailyStreakData = []
   for (let i = 6; i >= 0; i--) {
     const date = subDays(new Date(), i)
@@ -162,29 +162,39 @@ export function DashboardPage() {
         <Card className="p-6">
           <h3 className="text-lg font-medium text-text-primary mb-4">Recent Activity</h3>
           <div className="space-y-3">
-            {activityLogs.slice(-5).reverse().map((log, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <div className="font-medium text-text-primary">{log.activity.name}</div>
-                  <div className="text-sm text-text-secondary">
-                    {format(new Date(log.completionDate), 'MMM d, yyyy')}
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="text-sm text-text-secondary">Rating:</div>
-                  <div className="flex space-x-1">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className={`w-3 h-3 rounded-full ${
-                          i < log.rating ? 'bg-accent' : 'bg-gray-200'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
+            {activityLogs.length === 0 ? (
+              <div className="text-center py-4 text-text-secondary">
+                No activities completed yet. Start your journey!
               </div>
-            ))}
+            ) : (
+              activityLogs.slice(-5).reverse().map((log, index) => {
+                // Find the actual activity data by ID
+                const activity = activities.find(a => a.activityId === log.activityId) || { name: 'Unknown Activity' }
+                return (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-dark-surface rounded-lg">
+                    <div>
+                      <div className="font-medium text-text-primary dark:text-dark-text-primary">{activity.name}</div>
+                      <div className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                        {format(new Date(log.completionDate), 'MMM d, yyyy')}
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="text-sm text-text-secondary dark:text-dark-text-secondary">Rating:</div>
+                      <div className="flex space-x-1">
+                        {[...Array(5)].map((_, i) => (
+                          <div
+                            key={i}
+                            className={`w-3 h-3 rounded-full ${
+                              i < (log.rating || 0) ? 'bg-accent' : 'bg-gray-200 dark:bg-gray-600'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })
+            )}
           </div>
         </Card>
         
