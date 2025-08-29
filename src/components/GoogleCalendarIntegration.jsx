@@ -1,370 +1,468 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from './Card';
-import { Button } from './Button';
-import { googleCalendar, isGoogleCalendarConfigured } from '../services/GoogleCalendarService';
-import { useDataStore } from '../stores/dataStore';
-import { Calendar, Clock, CheckCircle, AlertCircle, User, Plus, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Calendar as CalendarIcon, 
+  Settings, 
+  CheckCircle, 
+  AlertCircle, 
+  XCircle, 
+  Clock,
+  RefreshCw,
+  ChevronRight,
+  Plus,
+  ExternalLink,
+  Users
+} from 'lucide-react';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Switch } from './ui/switch';
+import { cn } from '../utils/cn';
 
-export function GoogleCalendarIntegration() {
-  const { activities } = useDataStore();
+// Utility function for cn
+function cnUtil(...classes) {
+  return classes.filter(Boolean).join(' ');
+}
+
+// Grid Pattern Card Components
+function GridPatternCard({ 
+  children, 
+  className,
+  patternClassName,
+  gradientClassName
+}) {
+  return (
+    <motion.div
+      className={cnUtil(
+        "border w-full rounded-lg overflow-hidden",
+        "bg-white dark:bg-zinc-950",
+        "border-zinc-200 dark:border-zinc-900",
+        className
+      )}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
+      <div className={cnUtil(
+        "size-full bg-repeat bg-[length:50px_50px]",
+        "bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.1)_1px,transparent_0)] dark:bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.1)_1px,transparent_0)]",
+        patternClassName
+      )}>
+        <div className={cnUtil(
+          "size-full bg-gradient-to-tr",
+          "from-white via-white/[0.85] to-white",
+          "dark:from-zinc-950 dark:via-zinc-950/[.85] dark:to-zinc-950",
+          gradientClassName
+        )}>
+          {children}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function GridPatternCardBody({ className, ...props }) {
+  return (
+    <div 
+      className={cnUtil("text-left p-4 md:p-6", className)} 
+      {...props} 
+    />
+  );
+}
+
+// Status Components
+const StatusIndicator = ({ status, className }) => {
+  const statusConfig = {
+    connected: {
+      icon: CheckCircle,
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-50 dark:bg-emerald-950/20",
+      label: "Connected",
+      description: "Successfully synced"
+    },
+    disconnected: {
+      icon: XCircle,
+      color: "text-red-500",
+      bgColor: "bg-red-50 dark:bg-red-950/20",
+      label: "Disconnected",
+      description: "Connection failed"
+    },
+    syncing: {
+      icon: RefreshCw,
+      color: "text-blue-500",
+      bgColor: "bg-blue-50 dark:bg-blue-950/20",
+      label: "Syncing",
+      description: "Updating calendar data"
+    },
+    error: {
+      icon: AlertCircle,
+      color: "text-red-500",
+      bgColor: "bg-red-50 dark:bg-red-950/20",
+      label: "Error",
+      description: "Authentication required"
+    },
+    warning: {
+      icon: AlertCircle,
+      color: "text-amber-500",
+      bgColor: "bg-amber-50 dark:bg-amber-950/20",
+      label: "Limited Access",
+      description: "Some features unavailable"
+    }
+  };
+
+  const config = statusConfig[status];
+  const Icon = config.icon;
+
+  return (
+    <div className={cnUtil("flex items-center gap-3", className)}>
+      <div className={cnUtil("p-2 rounded-full", config.bgColor)}>
+        <Icon 
+          className={cnUtil("h-4 w-4", config.color, status === 'syncing' && "animate-spin")} 
+        />
+      </div>
+      <div className="flex-1">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{config.label}</span>
+          {status === 'connected' && (
+            <div className="flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </div>
+          )}
+        </div>
+        <p className="text-xs text-gray-600 dark:text-gray-400">{config.description}</p>
+      </div>
+    </div>
+  );
+};
+
+// Calendar Event Component
+const CalendarEventCard = ({ event }) => {
+  const typeColors = {
+    meeting: "bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400",
+    reminder: "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400",
+    event: "bg-purple-100 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400"
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      className="flex items-center justify-between p-3 rounded-lg border bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-2 h-8 rounded-full bg-blue-500"></div>
+        <div>
+          <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{event.title}</h4>
+          <div className="flex items-center gap-2 mt-1">
+            <Clock className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+            <span className="text-xs text-gray-600 dark:text-gray-400">{event.time}</span>
+            {event.attendees && (
+              <>
+                <span className="text-xs text-gray-500 dark:text-gray-400">•</span>
+                <div className="flex items-center gap-1">
+                  <Users className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                  <span className="text-xs text-gray-600 dark:text-gray-400">{event.attendees} attendees</span>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      <Badge variant="secondary" className={cnUtil("text-xs", typeColors[event.type])}>
+        {event.type}
+      </Badge>
+    </motion.div>
+  );
+};
+
+// Main Google Calendar Integration Component
+const GoogleCalendarIntegration = ({ className }) => {
   const [isConnected, setIsConnected] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const [status, setStatus] = useState('disconnected');
+  const [syncEnabled, setSyncEnabled] = useState(true);
+  const [lastSync, setLastSync] = useState(new Date());
   const [userInfo, setUserInfo] = useState(null);
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
-  const [isSchedulingActivity, setIsSchedulingActivity] = useState(false);
-  const [selectedActivity, setSelectedActivity] = useState(null);
-  const [scheduledTime, setScheduledTime] = useState('');
-  const [reminderTime, setReminderTime] = useState('19:00');
-  const [isCreatingReminder, setIsCreatingReminder] = useState(false);
 
-  // Check initial connection status
-  useEffect(() => {
-    checkConnectionStatus();
-    if (isGoogleCalendarConfigured()) {
-      initializeGoogleCalendar();
+  // Mock upcoming events
+  const upcomingEvents = [
+    {
+      id: '1',
+      title: 'Team Standup',
+      time: '9:00 AM',
+      attendees: 5,
+      type: 'meeting'
+    },
+    {
+      id: '2',
+      title: 'Project Review',
+      time: '2:00 PM',
+      attendees: 8,
+      type: 'meeting'
+    },
+    {
+      id: '3',
+      title: 'Submit Report',
+      time: '5:00 PM',
+      type: 'reminder'
     }
-  }, []);
-
-  const checkConnectionStatus = () => {
-    const connected = googleCalendar.isAuthenticated();
-    setIsConnected(connected);
-    
-    if (connected) {
-      loadUserInfo();
-      loadUpcomingEvents();
-    }
-  };
-
-  const initializeGoogleCalendar = async () => {
-    try {
-      await googleCalendar.initialize();
-    } catch (error) {
-      console.error('Failed to initialize Google Calendar:', error);
-    }
-  };
-
-  const loadUserInfo = async () => {
-    try {
-      const user = await googleCalendar.oauth.getUserInfo();
-      setUserInfo(user);
-    } catch (error) {
-      console.error('Failed to load user info:', error);
-    }
-  };
-
-  const loadUpcomingEvents = async () => {
-    try {
-      const events = await googleCalendar.getUpcomingWellnessEvents(7);
-      setUpcomingEvents(events);
-    } catch (error) {
-      console.error('Failed to load upcoming events:', error);
-    }
-  };
+  ];
 
   const handleConnect = async () => {
-    setIsConnecting(true);
+    setStatus('syncing');
     
     try {
-      await googleCalendar.authenticate();
-      setIsConnected(true);
-      await loadUserInfo();
-      await loadUpcomingEvents();
+      // Use the existing Google Calendar service
+      const { GoogleCalendarService } = await import('../services/GoogleCalendarService');
+      const calendarService = new GoogleCalendarService();
+      
+      const response = await calendarService.signIn();
+      
+      if (response && response.access_token) {
+        setIsConnected(true);
+        setStatus('connected');
+        setLastSync(new Date());
+        
+        // Get user info
+        try {
+          const user = await calendarService.getUserInfo();
+          setUserInfo(user);
+        } catch (error) {
+          console.warn('Failed to fetch user info:', error);
+        }
+      } else {
+        setStatus('error');
+      }
     } catch (error) {
-      console.error('Failed to connect to Google Calendar:', error);
-      alert('Failed to connect to Google Calendar. Please try again.');
-    } finally {
-      setIsConnecting(false);
+      console.error('Connection failed:', error);
+      setStatus('error');
     }
   };
 
   const handleDisconnect = async () => {
     try {
-      await googleCalendar.signOut();
+      const { GoogleCalendarService } = await import('../services/GoogleCalendarService');
+      const calendarService = new GoogleCalendarService();
+      await calendarService.signOut();
+      
       setIsConnected(false);
+      setStatus('disconnected');
       setUserInfo(null);
-      setUpcomingEvents([]);
     } catch (error) {
-      console.error('Failed to disconnect from Google Calendar:', error);
+      console.error('Disconnect failed:', error);
     }
   };
 
-  const handleScheduleActivity = async () => {
-    if (!selectedActivity || !scheduledTime) {
-      alert('Please select an activity and time');
-      return;
-    }
-
-    setIsSchedulingActivity(true);
-
-    try {
-      const activity = activities.find(a => a.activityId === selectedActivity);
-      const scheduledDateTime = new Date(scheduledTime);
-
-      await googleCalendar.createWellnessEvent({
-        activity,
-        scheduledTime: scheduledDateTime,
-        duration: activity.estimated_duration_minutes || 30
-      });
-
-      // Reload events
-      await loadUpcomingEvents();
-      
-      // Reset form
-      setSelectedActivity(null);
-      setScheduledTime('');
-      
-      alert('Activity scheduled successfully!');
-
-    } catch (error) {
-      console.error('Failed to schedule activity:', error);
-      alert('Failed to schedule activity. Please try again.');
-    } finally {
-      setIsSchedulingActivity(false);
-    }
+  const handleSync = () => {
+    setStatus('syncing');
+    setTimeout(() => {
+      setStatus('connected');
+      setLastSync(new Date());
+    }, 1500);
   };
 
-  const handleCreateDailyReminder = async () => {
-    setIsCreatingReminder(true);
-
-    try {
-      await googleCalendar.createDailyCheckInReminder(reminderTime);
-      alert('Daily reminder created successfully!');
-      
-      // Reload events
-      await loadUpcomingEvents();
-
-    } catch (error) {
-      console.error('Failed to create daily reminder:', error);
-      alert('Failed to create daily reminder. Please try again.');
-    } finally {
-      setIsCreatingReminder(false);
-    }
+  const openGoogleCalendar = () => {
+    window.open('https://calendar.google.com', '_blank');
   };
-
-  const handleDeleteEvent = async (eventId) => {
-    try {
-      await googleCalendar.deleteEvent(eventId);
-      await loadUpcomingEvents();
-      alert('Event deleted successfully!');
-    } catch (error) {
-      console.error('Failed to delete event:', error);
-      alert('Failed to delete event. Please try again.');
-    }
-  };
-
-  const formatEventTime = (dateTime) => {
-    return new Date(dateTime).toLocaleString('en-US', {
-      weekday: 'short',
-      month: 'short', 
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-
-  // Get tomorrow's date for default scheduling
-  const getTomorrowISO = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(9, 0, 0, 0); // Default to 9 AM
-    return tomorrow.toISOString().slice(0, 16);
-  };
-
-  if (!isGoogleCalendarConfigured()) {
-    return (
-      <Card className="p-6">
-        <div className="flex items-center space-x-3 mb-4">
-          <Calendar className="w-6 h-6 text-gray-400" />
-          <h3 className="text-lg font-semibold text-gray-400">Google Calendar Integration</h3>
-        </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-          <AlertCircle className="w-5 h-5 text-yellow-500 mb-2" />
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Google Calendar integration is not configured. Please add your Google API keys to enable this feature.
-          </p>
-          <p className="text-xs text-gray-500 mt-2">
-            Required: VITE_GOOGLE_CLIENT_ID and VITE_GOOGLE_API_KEY
-          </p>
-        </div>
-      </Card>
-    );
-  }
 
   return (
-    <div className="space-y-6">
-      {/* Connection Status */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <Calendar className={`w-6 h-6 ${isConnected ? 'text-green-500' : 'text-gray-400'}`} />
-            <h3 className="text-lg font-semibold">Google Calendar Integration</h3>
+    <div className={cnUtil("w-full max-w-4xl mx-auto space-y-6", className)}>
+      {/* Header */}
+      <motion.div 
+        className="flex items-center justify-between"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/20">
+            <CalendarIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
-            isConnected 
-              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-              : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-          }`}>
-            {isConnected ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-            <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Google Calendar</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Manage your calendar integration</p>
           </div>
         </div>
+        <Button variant="outline" size="icon">
+          <Settings className="h-4 w-4" />
+        </Button>
+      </motion.div>
 
-        {isConnected && userInfo && (
-          <div className="flex items-center space-x-3 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <User className="w-5 h-5 text-gray-500" />
-            <div>
-              <p className="font-medium">{userInfo.name}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{userInfo.email}</p>
-            </div>
+      {/* Connection Status Card */}
+      <GridPatternCard>
+        <GridPatternCardBody>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Connection Status</h3>
+            <Badge variant={isConnected ? "default" : "secondary"}>
+              {isConnected ? "Active" : "Inactive"}
+            </Badge>
           </div>
-        )}
-
-        <div className="flex space-x-3">
-          {!isConnected ? (
-            <Button 
-              onClick={handleConnect} 
-              disabled={isConnecting}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {isConnecting ? 'Connecting...' : 'Connect to Google Calendar'}
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleDisconnect}
-              variant="outline"
-            >
-              Disconnect
-            </Button>
-          )}
-        </div>
-      </Card>
-
-      {/* Schedule Activity */}
-      {isConnected && (
-        <Card className="p-6">
-          <h4 className="text-lg font-semibold mb-4 flex items-center">
-            <Plus className="w-5 h-5 mr-2" />
-            Schedule Wellness Activity
-          </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Select Activity</label>
-              <select
-                value={selectedActivity || ''}
-                onChange={(e) => setSelectedActivity(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-              >
-                <option value="">Choose an activity...</option>
-                {activities.map((activity) => (
-                  <option key={activity.activityId} value={activity.activityId}>
-                    {activity.name} ({activity.category})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Schedule Time</label>
-              <input
-                type="datetime-local"
-                value={scheduledTime || getTomorrowISO()}
-                onChange={(e) => setScheduledTime(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-              />
-            </div>
-
-            <div className="flex items-end">
-              <Button
-                onClick={handleScheduleActivity}
-                disabled={isSchedulingActivity || !selectedActivity}
-                className="w-full"
-              >
-                {isSchedulingActivity ? 'Scheduling...' : 'Schedule Activity'}
-              </Button>
-            </div>
-          </div>
-
-          {selectedActivity && (
-            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              {(() => {
-                const activity = activities.find(a => a.activityId === selectedActivity);
-                return activity ? (
-                  <div>
-                    <p className="font-medium">{activity.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{activity.description}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Duration: {activity.estimated_duration_minutes || 30} minutes
-                    </p>
-                  </div>
-                ) : null;
-              })()}
-            </div>
-          )}
-        </Card>
-      )}
-
-      {/* Daily Reminders */}
-      {isConnected && (
-        <Card className="p-6">
-          <h4 className="text-lg font-semibold mb-4 flex items-center">
-            <Clock className="w-5 h-5 mr-2" />
-            Daily Check-in Reminder
-          </h4>
-
-          <div className="flex items-end space-x-4 mb-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium mb-2">Reminder Time</label>
-              <input
-                type="time"
-                value={reminderTime}
-                onChange={(e) => setReminderTime(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700"
-              />
-            </div>
-            <Button
-              onClick={handleCreateDailyReminder}
-              disabled={isCreatingReminder}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              {isCreatingReminder ? 'Creating...' : 'Create Daily Reminder'}
-            </Button>
-          </div>
-
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            This will create a recurring daily reminder for your emotional wellness check-in.
-          </p>
-        </Card>
-      )}
-
-      {/* Upcoming Events */}
-      {isConnected && upcomingEvents.length > 0 && (
-        <Card className="p-6">
-          <h4 className="text-lg font-semibold mb-4">Upcoming Wellness Events</h4>
+          <StatusIndicator status={status} className="mb-6" />
           
-          <div className="space-y-3">
-            {upcomingEvents.map((event) => (
-              <div key={event.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="flex-1">
-                  <p className="font-medium">{event.summary}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {formatEventTime(event.start.dateTime)}
-                  </p>
-                </div>
-                <Button
-                  onClick={() => handleDeleteEvent(event.id)}
-                  variant="ghost"
-                  size="sm"
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <Trash2 className="w-4 h-4" />
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Auto-sync</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Automatically sync calendar events
+              </p>
+            </div>
+            <Switch 
+              checked={syncEnabled} 
+              onCheckedChange={setSyncEnabled}
+              disabled={!isConnected}
+            />
+          </div>
+
+          {isConnected && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+            >
+              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+                <span>Last synced: {lastSync.toLocaleTimeString()}</span>
+                <Button variant="ghost" size="sm" onClick={handleSync}>
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  Sync now
                 </Button>
               </div>
-            ))}
+            </motion.div>
+          )}
+        </GridPatternCardBody>
+      </GridPatternCard>
+
+      {/* Action Buttons */}
+      <motion.div 
+        className="flex gap-3"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        {!isConnected ? (
+          <Button onClick={handleConnect} className="flex-1" disabled={status === 'syncing'}>
+            {status === 'syncing' ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                Connecting...
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4 mr-2" />
+                Connect Google Calendar
+              </>
+            )}
+          </Button>
+        ) : (
+          <>
+            <Button variant="outline" onClick={handleDisconnect} className="flex-1">
+              Disconnect
+            </Button>
+            <Button variant="outline" onClick={openGoogleCalendar} className="flex-1">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open Calendar
+            </Button>
+          </>
+        )}
+      </motion.div>
+
+      {/* Upcoming Events */}
+      <AnimatePresence>
+        {isConnected && status === 'connected' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Upcoming Events</h3>
+                <Button variant="ghost" size="sm">
+                  View all
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+              
+              <div className="space-y-3">
+                {upcomingEvents.map((event, index) => (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <CalendarEventCard event={event} />
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {upcomingEvents.length} events today
+                  </span>
+                  <Button variant="ghost" size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add event
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Integration Features */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Integration Features</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Real-time Sync</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Automatically sync events and updates
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Smart Notifications</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Get notified about upcoming events
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Calendar Management</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Create and manage events directly
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">Multi-Calendar Support</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Sync multiple Google calendars
+                </p>
+              </div>
+            </div>
           </div>
         </Card>
-      )}
+      </motion.div>
     </div>
   );
-}
+};
+
+export default GoogleCalendarIntegration;

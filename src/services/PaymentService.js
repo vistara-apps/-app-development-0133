@@ -36,7 +36,7 @@ export const SUBSCRIPTION_PLANS = {
       '1 support circle'
     ],
     basePrice: '0.001', // Base ETH equivalent
-    stripeProductId: import.meta.env.VITE_STRIPE_BASIC_PRODUCT_ID || 'prod_demo_basic'
+    stripePriceId: import.meta.env.VITE_STRIPE_BASIC_PRICE_ID || 'price_demo_basic'
   },
   premium: {
     id: 'premium',
@@ -52,7 +52,7 @@ export const SUBSCRIPTION_PLANS = {
       'Priority support'
     ],
     basePrice: '0.002', // Base ETH equivalent
-    stripeProductId: import.meta.env.VITE_STRIPE_PREMIUM_PRODUCT_ID || 'prod_demo_premium'
+    stripePriceId: import.meta.env.VITE_STRIPE_PREMIUM_PRICE_ID || 'price_demo_premium'
   },
   enterprise: {
     id: 'enterprise',
@@ -68,7 +68,7 @@ export const SUBSCRIPTION_PLANS = {
       'API access'
     ],
     basePrice: '0.005', // Base ETH equivalent
-    stripeProductId: import.meta.env.VITE_STRIPE_ENTERPRISE_PRODUCT_ID || 'prod_demo_enterprise'
+    stripePriceId: import.meta.env.VITE_STRIPE_ENTERPRISE_PRICE_ID || 'price_demo_enterprise'
   }
 };
 
@@ -259,7 +259,7 @@ export class StripePayment {
         planId,
         userId,
         paymentMethodId,
-        productId: plan.stripeProductId,
+        priceId: plan.stripePriceId,
         price: plan.price
       });
 

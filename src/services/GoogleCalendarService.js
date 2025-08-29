@@ -1,8 +1,8 @@
 /**
- * Google Calendar Integration Service for ResilientFlow
+ * Modern Google Calendar Integration Service for ResilientFlow
  * 
- * This service handles Google OAuth authentication and Calendar API integration
- * for scheduling wellness activities and reminders.
+ * This service uses Google Identity Services (GIS) for modern OAuth 2.0 authentication
+ * and Google Calendar API v3 for calendar integration.
  */
 
 // Google API Configuration
@@ -10,14 +10,15 @@ const GOOGLE_CONFIG = {
   clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'demo-client-id',
   apiKey: import.meta.env.VITE_GOOGLE_API_KEY || 'demo-api-key',
   discoveryDoc: 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest',
-  scopes: 'https://www.googleapis.com/auth/calendar.events'
+  scopes: 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/userinfo.profile',
+  redirectUri: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173'
 };
 
 // Demo mode flag
 const IS_DEMO_MODE = !import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_GOOGLE_CLIENT_ID === 'demo-client-id';
 
 /**
- * Google Calendar OAuth Manager
+ * Modern Google Calendar OAuth Manager using Google Identity Services
  */
 export class GoogleCalendarOAuth {
   constructor() {
@@ -25,17 +26,18 @@ export class GoogleCalendarOAuth {
     this.tokenClient = null;
     this.isInitialized = false;
     this.isAuthorized = false;
+    this.userInfo = null;
   }
 
   /**
-   * Initialize Google APIs and OAuth
+   * Initialize Google APIs and OAuth with modern approach
    */
   async initialize() {
     try {
       // Load Google APIs
       await this.loadGoogleAPIs();
       
-      // Initialize gapi
+      // Initialize gapi for Calendar API
       await this.gapi.load('client', async () => {
         await this.gapi.client.init({
           apiKey: GOOGLE_CONFIG.apiKey,
@@ -43,10 +45,12 @@ export class GoogleCalendarOAuth {
         });
       });
 
-      // Initialize OAuth token client
+      // Initialize OAuth token client with modern configuration
       this.tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CONFIG.clientId,
         scope: GOOGLE_CONFIG.scopes,
+        redirect_uri: GOOGLE_CONFIG.redirectUri,
+        ux_mode: 'popup', // Use popup instead of redirect for better UX
         callback: '', // Will be set for each request
       });
 
@@ -61,7 +65,7 @@ export class GoogleCalendarOAuth {
   }
 
   /**
-   * Load Google APIs dynamically
+   * Load Google APIs dynamically with modern approach
    */
   loadGoogleAPIs() {
     return new Promise((resolve, reject) => {
@@ -72,26 +76,34 @@ export class GoogleCalendarOAuth {
         return;
       }
 
-      // Load gapi
-      const gapiScript = document.createElement('script');
-      gapiScript.src = 'https://apis.google.com/js/api.js';
-      gapiScript.onload = () => {
-        this.gapi = window.gapi;
+      // Load Google Identity Services first (modern approach)
+      const gisScript = document.createElement('script');
+      gisScript.src = 'https://accounts.google.com/gsi/client';
+      gisScript.async = true;
+      gisScript.defer = true;
+      
+      gisScript.onload = () => {
+        // Then load gapi for Calendar API
+        const gapiScript = document.createElement('script');
+        gapiScript.src = 'https://apis.google.com/js/api.js';
+        gapiScript.async = true;
+        gapiScript.defer = true;
         
-        // Load Google Identity Services
-        const gisScript = document.createElement('script');
-        gisScript.src = 'https://accounts.google.com/gsi/client';
-        gisScript.onload = () => resolve();
-        gisScript.onerror = () => reject(new Error('Failed to load Google Identity Services'));
-        document.head.appendChild(gisScript);
+        gapiScript.onload = () => {
+          this.gapi = window.gapi;
+          resolve();
+        };
+        gapiScript.onerror = () => reject(new Error('Failed to load Google APIs'));
+        document.head.appendChild(gapiScript);
       };
-      gapiScript.onerror = () => reject(new Error('Failed to load Google APIs'));
-      document.head.appendChild(gapiScript);
+      
+      gisScript.onerror = () => reject(new Error('Failed to load Google Identity Services'));
+      document.head.appendChild(gisScript);
     });
   }
 
   /**
-   * Sign in to Google and authorize calendar access
+   * Sign in to Google and authorize calendar access with modern OAuth flow
    */
   async signIn() {
     if (!this.isInitialized) {
@@ -100,19 +112,32 @@ export class GoogleCalendarOAuth {
 
     return new Promise((resolve, reject) => {
       try {
+        // Set up callback for this specific request
         this.tokenClient.callback = async (response) => {
           if (response.error) {
-            reject(new Error(response.error));
+            console.error('OAuth error:', response.error);
+            reject(new Error(`OAuth failed: ${response.error}`));
             return;
           }
 
-          this.isAuthorized = true;
-          
-          // Store token info for session
-          sessionStorage.setItem('google_access_token', response.access_token);
-          sessionStorage.setItem('google_token_expires', Date.now() + (response.expires_in * 1000));
-          
-          resolve(response);
+          if (response.access_token) {
+            this.isAuthorized = true;
+            
+            // Store token info for session
+            sessionStorage.setItem('google_access_token', response.access_token);
+            sessionStorage.setItem('google_token_expires', Date.now() + (response.expires_in * 1000));
+            
+            // Get user info
+            try {
+              await this.fetchUserInfo(response.access_token);
+            } catch (error) {
+              console.warn('Failed to fetch user info:', error);
+            }
+            
+            resolve(response);
+          } else {
+            reject(new Error('No access token received'));
+          }
         };
 
         // Check if already authorized
@@ -125,8 +150,11 @@ export class GoogleCalendarOAuth {
           return;
         }
 
-        // Request authorization
-        this.tokenClient.requestAccessToken({ prompt: 'consent' });
+        // Request authorization with modern popup approach
+        this.tokenClient.requestAccessToken({ 
+          prompt: 'consent',
+          hint: this.userInfo?.email // Pre-fill email if available
+        });
         
       } catch (error) {
         reject(error);
@@ -152,6 +180,7 @@ export class GoogleCalendarOAuth {
       sessionStorage.removeItem('google_access_token');
       sessionStorage.removeItem('google_token_expires');
       this.isAuthorized = false;
+      this.userInfo = null; // Clear user info on sign out
 
       console.log('Signed out from Google Calendar');
       return true;
@@ -188,6 +217,23 @@ export class GoogleCalendarOAuth {
       throw new Error('Not signed in to Google');
     }
 
+    // Check if we have cached user info
+    if (this.userInfo) {
+      return this.userInfo;
+    }
+
+    // Check session storage for cached user info
+    const cachedUserInfo = sessionStorage.getItem('google_user_info');
+    if (cachedUserInfo) {
+      try {
+        this.userInfo = JSON.parse(cachedUserInfo);
+        return this.userInfo;
+      } catch (error) {
+        console.warn('Failed to parse cached user info:', error);
+      }
+    }
+
+    // Fetch fresh user info
     try {
       const response = await fetch('https://www.googleapis.com/oauth2/v1/userinfo', {
         headers: {
@@ -199,10 +245,36 @@ export class GoogleCalendarOAuth {
         throw new Error('Failed to get user info');
       }
 
-      return await response.json();
+      this.userInfo = await response.json();
+      sessionStorage.setItem('google_user_info', JSON.stringify(this.userInfo));
+      return this.userInfo;
 
     } catch (error) {
       console.error('Error getting user info:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch user information from Google
+   */
+  async fetchUserInfo(accessToken) {
+    try {
+      const response = await fetch('https://www.googleapis.com/oauth2/v1/userinfo', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get user info');
+      }
+
+      this.userInfo = await response.json();
+      sessionStorage.setItem('google_user_info', JSON.stringify(this.userInfo));
+      return this.userInfo;
+    } catch (error) {
+      console.error('Error fetching user info:', error);
       throw error;
     }
   }
