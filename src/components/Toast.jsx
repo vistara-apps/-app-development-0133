@@ -82,12 +82,12 @@ export function Toast({
             <div className="flex-shrink-0">{icons[type]}</div>
             <div className="ml-3 w-0 flex-1">
               {title && (
-                <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">
+                <p className="text-sm font-medium text-text-primary dark:text-text-primary">
                   {title}
                 </p>
               )}
               {message && (
-                <p className="mt-1 text-sm text-text-secondary dark:text-dark-text-secondary">
+                <p className="mt-1 text-sm text-text-secondary dark:text-text-secondary">
                   {message}
                 </p>
               )}
@@ -96,7 +96,7 @@ export function Toast({
         </div>
         
         <button
-          className="absolute top-2 right-2 text-text-tertiary hover:text-text-primary dark:text-dark-text-tertiary dark:hover:text-dark-text-primary p-1 rounded-full"
+          className="absolute top-2 right-2 text-text-tertiary hover:text-text-primary dark:text-text-tertiary dark:hover:text-dark-text-primary p-1 rounded-full"
           onClick={handleClose}
           aria-label="Close notification"
         >
@@ -104,7 +104,7 @@ export function Toast({
         </button>
         
         {showProgress && (
-          <div className="h-1 bg-gray-200 dark:bg-dark-border">
+          <div className="h-1 bg-gray-200 dark:bg-neutral-700">
             <div
               className={`h-full transition-all ease-linear duration-100 ${
                 type === 'success' ? 'bg-success' :

@@ -193,8 +193,8 @@ export const useDataStore = create((set, get) => ({
   // Initialize store with real data from Supabase
   initialize: async () => {
     try {
-      const user = await Auth.getCurrentUser()
-      if (!user) {
+      const session = await Auth.getSession()
+      if (!session?.user) {
         // Use mock data for demo users
         set({
           dailyEntries: generateMockEntries(),
@@ -206,7 +206,7 @@ export const useDataStore = create((set, get) => ({
         return
       }
 
-      set({ userId: user.id })
+      set({ userId: session.user.id })
 
       // Load real data from Supabase
       const [dailyEntries, activities, activityLogs] = await Promise.all([
@@ -241,7 +241,8 @@ export const useDataStore = create((set, get) => ({
   addDailyEntry: async (entry) => {
     try {
       const state = get()
-      const user = await Auth.getCurrentUser()
+      const session = await Auth.getSession()
+      const user = session?.user
       
       if (!user && state.userId === 'demo-user-1') {
         // Mock behavior for demo
@@ -284,7 +285,8 @@ export const useDataStore = create((set, get) => ({
   addActivityLog: async (log) => {
     try {
       const state = get()
-      const user = await Auth.getCurrentUser()
+      const session = await Auth.getSession()
+      const user = session?.user
       
       if (!user && state.userId === 'demo-user-1') {
         // Mock behavior for demo

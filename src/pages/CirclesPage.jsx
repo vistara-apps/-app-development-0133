@@ -106,7 +106,7 @@ export function CirclesPage() {
       
       {/* Tabs with better styling */}
       <div className="flex justify-center">
-        <div className="flex bg-surface dark:bg-dark-surface rounded-xl p-1 border border-border dark:border-dark-border">
+        <div className="flex bg-white dark:bg-neutral-900 rounded-xl p-1 border border-neutral-200 dark:border-neutral-700 dark:border-dark-border">
           <button
             className={`px-6 py-3 font-medium text-sm rounded-lg transition-all duration-200 ${
               activeTab === 'my-circles'
@@ -139,7 +139,7 @@ export function CirclesPage() {
             placeholder="Search circles..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-border dark:border-dark-border rounded-xl bg-surface dark:bg-dark-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+            className="w-full pl-12 pr-4 py-3 border border-neutral-200 dark:border-neutral-700 dark:border-dark-border rounded-xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
           />
         </div>
       </div>

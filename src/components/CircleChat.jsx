@@ -56,7 +56,7 @@ export function CircleChat({ circleId }) {
         {Object.entries(groupedMessages).map(([date, dateMessages]) => (
           <div key={date} className="space-y-4">
             <div className="flex items-center justify-center">
-              <div className="text-xs text-text-secondary bg-gray-100 dark:bg-dark-border/50 px-3 py-1 rounded-full">
+              <div className="text-xs text-text-secondary bg-gray-100 dark:bg-neutral-700/50 px-3 py-1 rounded-full">
                 {format(new Date(date), 'EEEE, MMMM d, yyyy')}
               </div>
             </div>
@@ -92,7 +92,7 @@ export function CircleChat({ circleId }) {
                       className={`mx-2 px-4 py-2 rounded-lg ${
                         isCurrentUser 
                           ? 'bg-primary text-white' 
-                          : 'bg-gray-100 dark:bg-dark-border/50 text-text-primary dark:text-dark-text-primary'
+                          : 'bg-gray-100 dark:bg-neutral-700/50 text-text-primary dark:text-text-primary'
                       }`}
                     >
                       {!isCurrentUser && (
@@ -121,7 +121,7 @@ export function CircleChat({ circleId }) {
           onChange={(e) => setMessageText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type a message..."
-          className="flex-1 p-3 border border-border dark:border-dark-border rounded-md bg-surface dark:bg-dark-surface focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+          className="flex-1 p-3 border border-neutral-200 dark:border-neutral-700 dark:border-dark-border rounded-md bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
           rows={2}
         />
         <Button 

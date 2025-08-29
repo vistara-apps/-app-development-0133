@@ -61,9 +61,9 @@ export function AppShell({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-bg dark:bg-dark-bg">
+    <div className="min-h-screen bg-white dark:bg-neutral-900">
       {/* Header */}
-      <header className={`sticky top-0 z-30 bg-white dark:bg-dark-surface border-b border-gray-200 dark:border-dark-border transition-shadow ${
+              <header className={`sticky top-0 z-30 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 transition-shadow ${
         scrolled ? 'shadow-sm' : ''
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,7 +72,7 @@ export function AppShell({ children }) {
               {/* Mobile menu button */}
               <button
                 type="button"
-                className="md:hidden p-2 mr-3 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="md:hidden p-2 mr-3 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 onClick={toggleMobileMenu}
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-menu"
@@ -86,7 +86,7 @@ export function AppShell({ children }) {
               </button>
               
               {/* Logo */}
-              <Link to="/" className="text-xl font-bold text-blue-600 hover:text-blue-700">
+              <Link to="/" className="text-xl font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                 ResilientFlow
               </Link>
               
@@ -98,8 +98,8 @@ export function AppShell({ children }) {
                     to={item.href}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       location.pathname === item.href
-                        ? 'text-blue-600 bg-blue-50'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
                     }`}
                     aria-current={location.pathname === item.href ? 'page' : undefined}
                   >
@@ -118,14 +118,14 @@ export function AppShell({ children }) {
               <div className="relative">
                 <button
                   type="button"
-                  className="flex items-center space-x-2 p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  className="flex items-center space-x-2 p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                   onClick={toggleUserMenu}
                   aria-expanded={userMenuOpen}
                   aria-haspopup="true"
                 >
                   <User className="w-5 h-5" aria-hidden="true" />
                   <span className="hidden sm:inline text-sm font-medium">{user?.username}</span>
-                  <span className="hidden sm:inline px-2 py-1 bg-green-100 text-green-800 rounded-sm text-xs font-medium">
+                  <span className="hidden sm:inline px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-sm text-xs font-medium">
                     {user?.subscriptionTier}
                   </span>
                   <ChevronDown className="w-4 h-4" aria-hidden="true" />
@@ -134,18 +134,18 @@ export function AppShell({ children }) {
                 {/* User dropdown menu */}
                 {userMenuOpen && (
                   <div 
-                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50"
+                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-800 rounded-md shadow-lg border border-gray-200 dark:border-neutral-700 py-1 z-50"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="user-menu"
                   >
-                    <div className="px-4 py-2 border-b border-border dark:border-dark-border">
-                      <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">{user?.username}</p>
-                      <p className="text-xs text-text-secondary dark:text-dark-text-secondary truncate">{user?.email}</p>
+                    <div className="px-4 py-2 border-b border-neutral-200 dark:border-neutral-700">
+                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.username}</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{user?.email}</p>
                     </div>
                     <Link
                       to="/settings"
-                      className="block px-4 py-2 text-sm text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50"
+                      className="block px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       role="menuitem"
                       onClick={() => setUserMenuOpen(false)}
                     >
@@ -156,7 +156,7 @@ export function AppShell({ children }) {
                     </Link>
                     <Link
                       to="/settings/privacy"
-                      className="block px-4 py-2 text-sm text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50"
+                      className="block px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       role="menuitem"
                       onClick={() => setUserMenuOpen(false)}
                     >
@@ -167,7 +167,7 @@ export function AppShell({ children }) {
                     </Link>
                     <Link
                       to="/integrations"
-                      className="block px-4 py-2 text-sm text-text-secondary dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-border/50"
+                      className="block px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       role="menuitem"
                       onClick={() => setUserMenuOpen(false)}
                     >
@@ -177,7 +177,7 @@ export function AppShell({ children }) {
                       </div>
                     </Link>
                     <button
-                      className="w-full text-left block px-4 py-2 text-sm text-error hover:bg-gray-100 dark:hover:bg-dark-border/50"
+                      className="w-full text-left block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                       role="menuitem"
                       onClick={() => {
                         setUserMenuOpen(false)
@@ -199,7 +199,7 @@ export function AppShell({ children }) {
         {/* Mobile menu, show/hide based on menu state */}
         {mobileMenuOpen && (
           <div 
-            className="md:hidden border-t border-border dark:border-dark-border"
+            className="md:hidden border-t border-neutral-200 dark:border-neutral-700"
             id="mobile-menu"
           >
             <div className="px-2 pt-2 pb-3 space-y-1">
@@ -209,8 +209,8 @@ export function AppShell({ children }) {
                   to={item.href}
                   className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium ${
                     location.pathname === item.href
-                      ? 'text-primary bg-primary-light dark:bg-primary/20'
-                      : 'text-text-secondary dark:text-dark-text-secondary hover:text-text-primary dark:hover:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-border/50'
+                      ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
                   }`}
                   aria-current={location.pathname === item.href ? 'page' : undefined}
                   onClick={() => setMobileMenuOpen(false)}
@@ -225,12 +225,12 @@ export function AppShell({ children }) {
       </header>
 
       {/* Main Content */}
-      <main className="relative flex flex-col items-center p-6 justify-center">
+      <main className="relative flex flex-col items-center p-6 justify-center bg-white dark:bg-neutral-900">
         {children}
       </main>
 
       {/* Mobile Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface dark:bg-dark-surface border-t border-border dark:border-dark-border px-4 py-2 z-20">
+              <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-700 px-4 py-2 z-20">
         <div className="flex justify-around">
           {navigation.map((item) => (
             <Link
@@ -238,8 +238,8 @@ export function AppShell({ children }) {
               to={item.href}
               className={`flex flex-col items-center space-y-1 p-2 rounded-md ${
                 location.pathname === item.href
-                  ? 'text-primary'
-                  : 'text-text-secondary dark:text-dark-text-secondary'
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-600 dark:text-gray-400'
               }`}
               aria-current={location.pathname === item.href ? 'page' : undefined}
             >
