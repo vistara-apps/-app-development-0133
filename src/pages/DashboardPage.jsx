@@ -9,7 +9,7 @@ import { TrendingUp, Calendar, Activity, Target, Users, ArrowRight } from 'lucid
 import { Link } from 'react-router-dom'
 
 export function DashboardPage() {
-  const { dailyEntries, activityLogs, getRecentEntries, getActivityCompletionStreak, getTodayEntry } = useDataStore()
+  const { dailyEntries, activityLogs, activities, getRecentEntries, getActivityCompletionStreak, getTodayEntry } = useDataStore()
   const { getUserCircles, getCircleMembers } = useCirclesStore()
 
   // Prepare chart data
@@ -38,12 +38,19 @@ export function DashboardPage() {
   
   const weeklyCheckIns = dailyEntries.filter(entry => last7Days.includes(entry.date)).length
   const weeklyActivities = activityLogs.filter(log => last7Days.includes(log.completionDate)).length
-  const mindfulnessActivities = activityLogs.filter(log => 
-    last7Days.includes(log.completionDate) && log.activity.type === 'mindfulness'
-  ).length
-  const journalingActivities = activityLogs.filter(log => 
-    last7Days.includes(log.completionDate) && log.activity.type === 'journaling'
-  ).length
+  
+  // Properly look up activity information from the activities array
+  const mindfulnessActivities = activityLogs.filter(log => {
+    if (!last7Days.includes(log.completionDate)) return false
+    const activity = activities.find(a => a.activityId === log.activityId)
+    return activity && activity.type === 'mindfulness'
+  }).length
+  
+  const journalingActivities = activityLogs.filter(log => {
+    if (!last7Days.includes(log.completionDate)) return false
+    const activity = activities.find(a => a.activityId === log.activityId)
+    return activity && activity.type === 'journaling'
+  }).length
 
   const weeklyData = [
     { label: 'Check-ins', progress: Math.round((weeklyCheckIns / 7) * 100), value: `${weeklyCheckIns}/7` },
