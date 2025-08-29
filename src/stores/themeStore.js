@@ -39,11 +39,16 @@ export const useThemeStore = create(
         console.log('setTheme called with:', theme)
         set({ theme })
         applyTheme(theme)
+        
+        // Log the current state after setting
+        console.log('Theme state after setTheme:', get().theme)
+        console.log('Current HTML classes:', document.documentElement.className)
       },
       
       // Initialize theme on app load
       initTheme: () => {
         const { theme } = get()
+        console.log('Initializing theme with:', theme)
         applyTheme(theme)
         
         // Listen for system preference changes
@@ -52,6 +57,7 @@ export const useThemeStore = create(
           
           const handleChange = () => {
             if (get().theme === 'system') {
+              console.log('System theme preference changed, applying system theme')
               applyTheme('system')
             }
           }

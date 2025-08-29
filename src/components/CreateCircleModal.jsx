@@ -106,8 +106,8 @@ export function CreateCircleModal({ isOpen, onClose, onCircleCreated }) {
               value={focusArea}
               onChange={(e) => setFocusArea(e.target.value)}
               className={`w-full px-3 py-2 border ${
-                errors.focusArea ? 'border-error' : 'border-border dark:border-dark-border'
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 bg-surface dark:bg-dark-surface`}
+                errors.focusArea ? 'border-error' : 'border-neutral-200 dark:border-neutral-700 dark:border-dark-border'
+              } rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white dark:bg-neutral-900`}
             >
               <option value="">Select a focus area</option>
               {focusAreas.map((area) => (
@@ -129,7 +129,7 @@ export function CreateCircleModal({ isOpen, onClose, onCircleCreated }) {
               max="50"
               value={memberLimit}
               onChange={(e) => setMemberLimit(e.target.value)}
-              className="w-full px-3 py-2 border border-border dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 bg-surface dark:bg-dark-surface"
+              className="w-full px-3 py-2 border border-neutral-200 dark:border-neutral-700 dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white dark:bg-neutral-900"
             />
           </div>
           
@@ -183,7 +183,7 @@ export function CreateCircleModal({ isOpen, onClose, onCircleCreated }) {
         </div>
         
         {/* Circle Preview */}
-        <div className="border border-border dark:border-dark-border rounded-lg p-4 bg-gray-50 dark:bg-dark-border/20">
+        <div className="border border-neutral-200 dark:border-neutral-700 dark:border-dark-border rounded-lg p-4 bg-gray-50 dark:bg-neutral-700/20">
           <h4 className="text-sm font-medium text-text-secondary mb-2">Preview</h4>
           <div className="flex items-start space-x-4">
             <div className="p-3 bg-primary/10 rounded-lg">

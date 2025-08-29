@@ -1,83 +1,87 @@
-import React, { forwardRef } from 'react'
+import React from 'react'
+import { cn } from '../utils/cn'
 
-export const Card = forwardRef(({ 
-  children, 
-  variant = 'default', 
-  className = '',
-  interactive = false,
-  onClick,
-  title,
-  titleElement = 'h3',
-  subtitle,
-  headerAction,
-  footer,
-  ...props 
-}, ref) => {
+const Card = React.forwardRef(({ className, variant = "default", children, ...props }, ref) => {
   const variants = {
-    default: 'bg-white rounded-lg shadow-sm border border-gray-200',
-    elevated: 'bg-white rounded-lg shadow-lg border border-gray-200',
-    flat: 'bg-white rounded-lg border border-gray-200',
-    outline: 'bg-transparent rounded-lg border border-gray-300'
+    default: "card-modern",
+    gradient: "card-gradient",
+    wellness: "wellness-card",
+    glass: "glass",
   }
 
-  const interactiveClasses = interactive 
-    ? 'cursor-pointer transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-opacity-50' 
-    : '';
-
-  const TitleElement = titleElement;
-
-  const hasHeader = title || subtitle || headerAction;
-  const hasFooter = footer;
-
   return (
-    <div 
+    <div
       ref={ref}
-      className={`${variants[variant]} ${interactiveClasses} ${className}`}
-      onClick={interactive ? onClick : undefined}
-      tabIndex={interactive && onClick ? 0 : undefined}
-      role={interactive && onClick ? 'button' : undefined}
-      onKeyDown={interactive && onClick ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick(e);
-        }
-      } : undefined}
+      className={cn(
+        variants[variant],
+        className
+      )}
       {...props}
     >
-      {/* Card Header */}
-      {hasHeader && (
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div>
-            {title && (
-              <TitleElement className="text-lg font-medium text-gray-900">
-                {title}
-              </TitleElement>
-            )}
-            {subtitle && (
-              <p className="mt-1 text-sm text-gray-600">
-                {subtitle}
-              </p>
-            )}
-          </div>
-          {headerAction && (
-            <div>{headerAction}</div>
-          )}
-        </div>
-      )}
-
-      {/* Card Content */}
-      <div className={`${!hasHeader && !hasFooter ? 'p-6' : ''}`}>
-        {children}
-      </div>
-
-      {/* Card Footer */}
-      {hasFooter && (
-        <div className="p-6 border-t border-gray-200">
-          {footer}
-        </div>
-      )}
+      {children}
     </div>
   )
 })
 
-Card.displayName = 'Card'
+Card.displayName = "Card"
+
+const CardHeader = React.forwardRef(({ className, children, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  >
+    {children}
+  </div>
+))
+
+CardHeader.displayName = "CardHeader"
+
+const CardTitle = React.forwardRef(({ className, children, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn(
+      "text-2xl font-semibold leading-none tracking-tight text-text-primary",
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </h3>
+))
+
+CardTitle.displayName = "CardTitle"
+
+const CardDescription = React.forwardRef(({ className, children, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-sm text-text-secondary", className)}
+    {...props}
+  >
+    {children}
+  </p>
+))
+
+CardDescription.displayName = "CardDescription"
+
+const CardContent = React.forwardRef(({ className, children, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props}>
+    {children}
+  </div>
+))
+
+CardContent.displayName = "CardContent"
+
+const CardFooter = React.forwardRef(({ className, children, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  >
+    {children}
+  </div>
+))
+
+CardFooter.displayName = "CardFooter"
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }

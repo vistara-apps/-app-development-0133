@@ -128,7 +128,7 @@ export function CircleDetail({ circleId, onBack }) {
           <div className="space-y-4">
             <PrivacyToggle circleId={circleId} />
             
-            <div className="pt-4 border-t border-border dark:border-dark-border space-y-3">
+            <div className="pt-4 border-t border-neutral-200 dark:border-neutral-700 dark:border-dark-border space-y-3">
               {isAdmin && (
                 <Button 
                   variant="secondary" 
@@ -203,7 +203,7 @@ export function CircleDetail({ circleId, onBack }) {
               <textarea
                 value={promptText}
                 onChange={(e) => setPromptText(e.target.value)}
-                className="w-full p-3 border border-border dark:border-dark-border rounded-md bg-surface dark:bg-dark-surface focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="w-full p-3 border border-neutral-200 dark:border-neutral-700 dark:border-dark-border rounded-md bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/50"
                 rows={3}
                 placeholder="Enter a prompt or question for the group..."
               />
@@ -229,7 +229,7 @@ export function CircleDetail({ circleId, onBack }) {
       </div>
       
       {/* Tabs */}
-      <div className="flex border-b border-border dark:border-dark-border">
+      <div className="flex border-b border-neutral-200 dark:border-neutral-700 dark:border-dark-border">
         <button
           className={`px-4 py-2 font-medium text-sm flex items-center ${
             activeTab === 'chat'

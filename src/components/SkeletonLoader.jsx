@@ -9,7 +9,7 @@ export function SkeletonLoader({
   animate = true,
   rounded = 'md'
 }) {
-  const baseClasses = `bg-gray-200 dark:bg-dark-border ${
+  const baseClasses = `bg-gray-200 dark:bg-neutral-700 ${
     animate ? 'animate-pulse' : ''
   }`
   
@@ -72,7 +72,7 @@ export function TextSkeleton({ lines = 1, className = '', width = '100%' }) {
 
 export function CardSkeleton({ className = '' }) {
   return (
-    <div className={`p-6 space-y-4 bg-surface dark:bg-dark-surface rounded-lg border border-border dark:border-dark-border ${className}`}>
+    <div className={`p-6 space-y-4 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700 dark:border-dark-border ${className}`}>
       <SkeletonLoader variant="text" width="60%" />
       <TextSkeleton lines={3} />
       <div className="flex justify-between items-center pt-2">

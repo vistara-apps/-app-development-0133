@@ -43,7 +43,7 @@ export function EmptyState({
       
       {Icon && (
         <div className={`
-          text-text-tertiary dark:text-dark-text-tertiary mb-4
+          text-text-tertiary dark:text-text-tertiary mb-4
           ${sizes[size].icon}
         `}>
           <Icon className="w-full h-full" aria-hidden="true" />
@@ -52,7 +52,7 @@ export function EmptyState({
       
       {title && (
         <h3 className={`
-          font-medium text-text-primary dark:text-dark-text-primary
+          font-medium text-text-primary dark:text-text-primary
           ${sizes[size].title}
         `}>
           {title}
@@ -60,7 +60,7 @@ export function EmptyState({
       )}
       
       {description && (
-        <p className="mt-2 text-text-secondary dark:text-dark-text-secondary max-w-md mx-auto">
+        <p className="mt-2 text-text-secondary dark:text-text-secondary max-w-md mx-auto">
           {description}
         </p>
       )}

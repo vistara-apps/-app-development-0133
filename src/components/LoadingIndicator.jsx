@@ -17,7 +17,7 @@ export function LoadingIndicator({
   const colorClasses = {
     primary: 'text-primary',
     white: 'text-white',
-    gray: 'text-text-secondary dark:text-dark-text-secondary',
+    gray: 'text-text-secondary dark:text-text-secondary',
     accent: 'text-accent'
   }
 
@@ -47,10 +47,10 @@ export function LoadingIndicator({
 
   if (fullPage) {
     return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center bg-surface/80 dark:bg-dark-surface/80 backdrop-blur-sm z-50">
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm z-50">
         {spinner}
         {text && (
-          <p className="mt-4 text-text-primary dark:text-dark-text-primary font-medium">
+          <p className="mt-4 text-text-primary dark:text-text-primary font-medium">
             {text}
           </p>
         )}
@@ -62,7 +62,7 @@ export function LoadingIndicator({
     <div className="flex flex-col items-center justify-center p-4">
       {spinner}
       {text && (
-        <p className="mt-2 text-sm text-text-secondary dark:text-dark-text-secondary">
+        <p className="mt-2 text-sm text-text-secondary dark:text-text-secondary">
           {text}
         </p>
       )}

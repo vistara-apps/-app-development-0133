@@ -49,10 +49,10 @@ export function PremiumFeature({
         <div className="flex items-center">
           <Crown className="w-5 h-5 text-accent mr-2" aria-hidden="true" />
           <div>
-            <h3 className="font-medium text-text-primary dark:text-dark-text-primary">
+            <h3 className="font-medium text-text-primary dark:text-text-primary">
               {title}
             </h3>
-            <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
+            <p className="text-sm text-text-secondary dark:text-text-secondary">
               {description}
             </p>
           </div>
@@ -105,12 +105,12 @@ export function UpgradePrompt({
       <div className="p-6">
         <div className="flex items-center mb-4">
           <Crown className="w-6 h-6 text-accent mr-2" aria-hidden="true" />
-          <h3 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">
+          <h3 className="text-xl font-bold text-text-primary dark:text-text-primary">
             {title}
           </h3>
         </div>
         
-        <p className="text-text-secondary dark:text-dark-text-secondary mb-6">
+        <p className="text-text-secondary dark:text-text-secondary mb-6">
           {description}
         </p>
         
@@ -122,17 +122,17 @@ export function UpgradePrompt({
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
-              <span className="text-text-primary dark:text-dark-text-primary">{feature}</span>
+              <span className="text-text-primary dark:text-text-primary">{feature}</span>
             </li>
           ))}
         </ul>
         
         <div className="flex flex-col sm:flex-row sm:justify-between items-center space-y-3 sm:space-y-0 sm:space-x-3">
           <div className="text-center sm:text-left">
-            <div className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">
-              $10<span className="text-sm font-normal text-text-secondary dark:text-dark-text-secondary">/month</span>
+            <div className="text-2xl font-bold text-text-primary dark:text-text-primary">
+              $10<span className="text-sm font-normal text-text-secondary dark:text-text-secondary">/month</span>
             </div>
-            <div className="text-sm text-text-secondary dark:text-dark-text-secondary">
+            <div className="text-sm text-text-secondary dark:text-text-secondary">
               Cancel anytime
             </div>
           </div>

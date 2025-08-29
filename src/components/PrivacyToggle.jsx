@@ -127,7 +127,7 @@ export function PrivacyToggle({ circleId }) {
         </div>
       </div>
       
-      <div className="text-xs text-text-secondary bg-gray-50 dark:bg-dark-border/20 p-3 rounded-md">
+      <div className="text-xs text-text-secondary bg-gray-50 dark:bg-neutral-700/20 p-3 rounded-md">
         <p>Privacy settings only apply to this circle. You can have different settings for each circle you join.</p>
       </div>
     </div>
