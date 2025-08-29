@@ -53,10 +53,10 @@ export function AuthPage() {
         {/* Left side - Branding and features */}
         <div className="space-y-8">
           <div className="text-center lg:text-left">
-            <h1 className="text-5xl font-extrabold text-text-primary mb-4">
+            <h1 className="text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-4">
               ResilientFlow
             </h1>
-            <p className="text-xl text-text-secondary">
+            <p className="text-xl text-gray-600 dark:text-gray-300">
               Build daily emotional resilience, track your progress, with AI insights.
             </p>
           </div>
@@ -68,8 +68,8 @@ export function AuthPage() {
                   <feature.icon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-text-primary">{feature.title}</h3>
-                  <p className="text-sm text-text-secondary">{feature.description}</p>
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100">{feature.title}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{feature.description}</p>
                 </div>
               </div>
             ))}
@@ -79,10 +79,10 @@ export function AuthPage() {
         {/* Right side - Auth form */}
         <Card className="p-8 max-w-md w-full mx-auto">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-text-primary">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {isLogin ? 'Welcome back' : 'Get started'}
             </h2>
-            <p className="text-text-secondary">
+            <p className="text-gray-600 dark:text-gray-300">
               {isLogin ? 'Sign in to your account' : 'Create your account'}
             </p>
           </div>
@@ -125,7 +125,7 @@ export function AuthPage() {
 
           {/* Demo access */}
           <div className="mt-4 p-3 bg-accent/10 rounded-lg text-center">
-            <p className="text-sm text-text-secondary">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               Demo access: Use any email/password to try the app
             </p>
           </div>

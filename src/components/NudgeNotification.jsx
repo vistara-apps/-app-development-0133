@@ -40,12 +40,12 @@ export function NudgeNotification({
   const [feedbackRating, setFeedbackRating] = useState(null);
   const [feedbackText, setFeedbackText] = useState('');
   
-  // Mark as viewed when component mounts
+  // Mark as viewed when component mounts (only once per nudge)
   useEffect(() => {
-    if (nudge && onView) {
+    if (nudge && onView && nudge.nudgeId && !nudge.viewed) {
       onView(nudge.nudgeId);
     }
-  }, [nudge, onView]);
+  }, [nudge?.nudgeId]); // Only depend on nudgeId, not the whole nudge object or onView function
   
   // Auto-hide after delay if enabled
   useEffect(() => {

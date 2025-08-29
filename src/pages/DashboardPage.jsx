@@ -163,7 +163,7 @@ export function DashboardPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
+    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-700">
       {/* Header Section */}
       <section className="container-padding pt-8 pb-12">
         <div className="max-w-7xl mx-auto">
@@ -176,7 +176,7 @@ export function DashboardPage() {
               Welcome back,
               <span className="text-gradient-wellness block">Champion</span>
             </h1>
-            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Track your progress, celebrate your wins, and continue building your mental resilience.
             </p>
           </div>
@@ -203,7 +203,7 @@ export function DashboardPage() {
                   <div className={`text-2xl font-bold ${stat.color} mb-1`}>
                     {stat.value}
                   </div>
-                  <div className="text-sm text-text-secondary">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     {stat.label}
                   </div>
                 </div>
@@ -227,7 +227,7 @@ export function DashboardPage() {
                     </div>
                     <div>
                       <CardTitle>Emotional Trends</CardTitle>
-                      <p className="text-sm text-text-secondary">Your emotional score over the past week</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Your emotional score over the past week</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -253,7 +253,7 @@ export function DashboardPage() {
                     </div>
                     <div>
                       <CardTitle>Activity Completion</CardTitle>
-                      <p className="text-sm text-text-secondary">Daily activity completion rates</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Daily activity completion rates</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -286,7 +286,7 @@ export function DashboardPage() {
                     </div>
                     <div>
                       <CardTitle>Weekly Progress</CardTitle>
-                      <p className="text-sm text-text-secondary">Your daily activity goals</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Your daily activity goals</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -310,7 +310,7 @@ export function DashboardPage() {
                       </div>
                       <div>
                         <CardTitle>Recent Activities</CardTitle>
-                        <p className="text-sm text-text-secondary">Your latest completed activities</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Your latest completed activities</p>
                       </div>
                     </div>
                     <Link 
@@ -341,8 +341,8 @@ export function DashboardPage() {
                                <BookOpen className="h-4 w-4 text-purple-600" />}
                             </div>
                             <div>
-                              <div className="font-medium text-text-primary">{activity.name}</div>
-                              <div className="text-sm text-text-secondary">{activity.date} • {activity.duration}</div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">{activity.name}</div>
+                              <div className="text-sm text-gray-600 dark:text-gray-400">{activity.date} • {activity.duration}</div>
                             </div>
                           </div>
                           <CheckCircle className="h-5 w-5 text-emerald-600" />
@@ -351,7 +351,7 @@ export function DashboardPage() {
                     ) : (
                       <div className="text-center py-8">
                         <Activity className="h-12 w-12 text-neutral-400 mx-auto mb-3" />
-                        <p className="text-text-secondary">No activities completed yet this week</p>
+                        <p className="text-gray-600 dark:text-gray-400">No activities completed yet this week</p>
                         <Link 
                           to="/activities" 
                           className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium mt-2"
@@ -382,7 +382,7 @@ export function DashboardPage() {
                     </div>
                     <div>
                       <CardTitle>Your Support Circles</CardTitle>
-                      <p className="text-sm text-text-secondary">Connect with your wellness community</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Connect with your wellness community</p>
                     </div>
                   </div>
                   <Link 
@@ -406,10 +406,10 @@ export function DashboardPage() {
                           <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
                             <Users className="h-4 w-4 text-white" />
                           </div>
-                          <div className="font-medium text-text-primary">{circle.name}</div>
+                          <div className="font-medium text-gray-900 dark:text-gray-100">{circle.name}</div>
                         </div>
-                        <p className="text-sm text-text-secondary mb-3">{circle.description}</p>
-                        <div className="flex items-center justify-between text-xs text-text-tertiary">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{circle.description}</p>
+                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                           <span>{circle.memberCount || 0} members</span>
                           <span className={`px-2 py-1 rounded-full ${
                             circle.privacy === 'public' 
@@ -425,7 +425,7 @@ export function DashboardPage() {
                 ) : (
                   <div className="text-center py-8">
                     <Users2 className="h-12 w-12 text-neutral-400 mx-auto mb-3" />
-                    <p className="text-text-secondary mb-4">You haven't joined any support circles yet</p>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">You haven't joined any support circles yet</p>
                     <Link 
                       to="/circles" 
                       className="inline-flex items-center gap-2 wellness-button"
@@ -454,7 +454,7 @@ export function DashboardPage() {
                 Ready for Your Next Activity?
               </h2>
               
-              <p className="text-lg text-text-secondary mb-8 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
                 Continue building your resilience with personalized activities and guided sessions.
               </p>
               

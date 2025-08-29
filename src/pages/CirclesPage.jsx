@@ -88,8 +88,8 @@ export function CirclesPage() {
       {/* Header Section */}
       <div className="text-center space-y-6">
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-text-primary">Support Circles</h1>
-          <p className="text-xl text-text-secondary max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">Support Circles</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Connect, share, and grow with others on similar journeys
           </p>
         </div>
@@ -106,12 +106,12 @@ export function CirclesPage() {
       
       {/* Tabs with better styling */}
       <div className="flex justify-center">
-        <div className="flex bg-white dark:bg-neutral-900 rounded-xl p-1 border border-neutral-200 dark:border-neutral-700 dark:border-dark-border">
+        <div className="flex bg-white dark:bg-neutral-900 rounded-xl p-1 border border-neutral-200 dark:border-neutral-700">
           <button
             className={`px-6 py-3 font-medium text-sm rounded-lg transition-all duration-200 ${
               activeTab === 'my-circles'
-                ? 'text-primary bg-primary/10 shadow-sm'
-                : 'text-text-secondary hover:text-text-primary hover:bg-gray-50 dark:hover:bg-gray-800'
+                ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
             }`}
             onClick={() => setActiveTab('my-circles')}
           >
@@ -120,8 +120,8 @@ export function CirclesPage() {
           <button
             className={`px-6 py-3 font-medium text-sm rounded-lg transition-all duration-200 ${
               activeTab === 'discover'
-                ? 'text-primary bg-primary/10 shadow-sm'
-                : 'text-text-secondary hover:text-text-primary hover:bg-gray-50 dark:hover:bg-gray-800'
+                ? 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
             }`}
             onClick={() => setActiveTab('discover')}
           >
@@ -133,13 +133,13 @@ export function CirclesPage() {
       {/* Search with improved styling */}
       <div className="max-w-md mx-auto">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-secondary w-5 h-5" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 w-5 h-5" />
           <input
             type="text"
             placeholder="Search circles..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-neutral-200 dark:border-neutral-700 dark:border-dark-border rounded-xl bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+            className="w-full pl-12 pr-4 py-3 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all duration-200"
           />
         </div>
       </div>
@@ -152,7 +152,7 @@ export function CirclesPage() {
             const isUserCircle = userCircles.some(c => c.circleId === circle.circleId)
             
             return (
-              <Card key={circle.circleId} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 bg-gradient-to-br from-white to-gray-50 dark:from-dark-surface dark:to-gray-900/50">
+              <Card key={circle.circleId} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 bg-gradient-to-br from-white to-gray-50 dark:from-neutral-800 dark:to-neutral-700">
                 <div className="p-8 space-y-6">
                   {/* Header with privacy indicator */}
                   <div className="flex items-start justify-between">
@@ -160,7 +160,7 @@ export function CirclesPage() {
                       <div className="p-2 bg-primary/10 rounded-lg">
                         <Users className="w-5 h-5 text-primary" />
                       </div>
-                      <span className="text-sm font-medium text-text-secondary">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         {members.length} {members.length === 1 ? 'member' : 'members'}
                       </span>
                     </div>
@@ -179,19 +179,19 @@ export function CirclesPage() {
                   
                   {/* Circle content */}
                   <div className="space-y-4">
-                    <h3 className="text-xl font-semibold text-text-primary group-hover:text-primary transition-colors duration-200">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
                       {circle.name}
                     </h3>
-                    <p className="text-text-secondary text-base leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                       {circle.description}
                     </p>
-                    <div className="inline-block px-4 py-2 bg-primary/10 text-primary text-sm font-medium rounded-lg border border-primary/20">
+                    <div className="inline-block px-4 py-2 bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 text-sm font-medium rounded-lg border border-blue-200 dark:border-blue-800">
                       {circle.focusArea}
                     </div>
                   </div>
                   
                   {/* Creation date */}
-                  <div className="flex items-center text-sm text-text-secondary">
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <Calendar className="w-4 h-4 mr-2" />
                     Created {format(new Date(circle.createdAt), 'MMM d, yyyy')}
                   </div>
@@ -201,7 +201,7 @@ export function CirclesPage() {
                     {isUserCircle ? (
                       <>
                         <Button 
-                          className="flex-1 bg-primary hover:bg-primary-dark transition-colors duration-200"
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors duration-200"
                           onClick={() => setSelectedCircle(circle.circleId)}
                         >
                           <MessageCircle className="w-4 h-4 mr-2" />
@@ -231,7 +231,7 @@ export function CirclesPage() {
                       </>
                     ) : (
                       <Button 
-                        className="w-full bg-primary hover:bg-primary-dark transition-colors duration-200"
+                        className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors duration-200"
                         onClick={() => handleJoinCircle(circle.circleId)}
                         disabled={circle.isPrivate}
                       >
@@ -248,14 +248,14 @@ export function CirclesPage() {
       ) : (
         <div className="text-center py-16">
           <div className="w-20 h-20 mx-auto bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
-            <Users className="w-10 h-10 text-text-secondary" />
+            <Users className="w-10 h-10 text-gray-500 dark:text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold text-text-primary mb-3">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
             {activeTab === 'my-circles' 
               ? "You haven't joined any circles yet" 
               : "No circles found"}
           </h3>
-          <p className="text-text-secondary text-lg mb-8 max-w-md mx-auto">
+          <p className="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-md mx-auto">
             {activeTab === 'my-circles'
               ? "Join existing circles or create your own to connect with others on your resilience journey"
               : "Try adjusting your search or create your own circle to get started"}
@@ -284,28 +284,28 @@ export function CirclesPage() {
       {/* Circle Stats with improved design */}
       {activeTab === 'my-circles' && userCircles.length > 0 && (
         <Card className="p-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
-          <h3 className="text-2xl font-semibold text-text-primary mb-6 text-center">Your Circle Activity</h3>
+          <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6 text-center">Your Circle Activity</h3>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 mx-auto bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-4">
                 <Users className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
-              <div className="text-3xl font-bold text-text-primary mb-2">{userCircles.length}</div>
-              <div className="text-text-secondary">Circles Joined</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{userCircles.length}</div>
+              <div className="text-gray-600 dark:text-gray-400">Circles Joined</div>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center mb-4">
                 <MessageCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
-              <div className="text-3xl font-bold text-text-primary mb-2">24</div>
-              <div className="text-text-secondary">Messages Sent</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">24</div>
+              <div className="text-gray-600 dark:text-gray-400">Messages Sent</div>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 mx-auto bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center mb-4">
                 <Target className="w-8 h-8 text-purple-600 dark:text-purple-400" />
               </div>
-              <div className="text-3xl font-bold text-text-primary mb-2">85%</div>
-              <div className="text-text-secondary">Group Goal Progress</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">85%</div>
+              <div className="text-gray-600 dark:text-gray-400">Group Goal Progress</div>
             </div>
           </div>
         </Card>

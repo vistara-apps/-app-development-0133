@@ -90,7 +90,10 @@ export function deliverNudge(nudge, channel = 'app') {
  */
 export function trackNudgeInteraction(nudgeId, interaction, details = {}) {
   // In a real implementation, this would store the interaction in a database
-  console.log(`Tracking nudge interaction (${interaction}):`, nudgeId, details);
+  // Reduced logging to prevent console spam
+  if (interaction === 'actioned' || interaction === 'dismissed') {
+    console.log(`Nudge ${interaction}:`, nudgeId);
+  }
   
   // Update nudge in memory
   Object.values(activeNudges).forEach(userNudges => {

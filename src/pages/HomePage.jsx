@@ -84,9 +84,12 @@ export function HomePage() {
   }
 
   const handleConnectCalendar = () => {
-    // Enable external integrations in privacy settings first
-    const { updatePrivacy } = useSettingsStore.getState()
-    updatePrivacy({ allowExternalIntegrations: true })
+    // Ensure external integrations are enabled in privacy settings
+    const { privacy, updatePrivacy } = useSettingsStore.getState()
+    
+    if (!privacy.allowExternalIntegrations) {
+      updatePrivacy({ allowExternalIntegrations: true })
+    }
 
     // Navigate to integrations page
     navigate('/integrations')
