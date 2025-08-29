@@ -7,15 +7,32 @@
 import { StressTypes } from '../models/EmotionalDataTypes';
 import { analyzeEmotionalText } from './AIService';
 
+// Simple in-memory cache for stress analysis results
+const analysisCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const MAX_CACHE_SIZE = 50;
+
 /**
- * Classifies stress from a daily entry
+ * Lightweight stress classifier with caching
  * @param {Object} entry - The daily entry to analyze
  * @param {Array} recentEntries - Recent entries for context
  * @returns {Object} - Stress analysis results
  */
 export async function classifyStressFromEntry(entry, recentEntries = []) {
-  // In a real implementation, this would use a more sophisticated model
-  console.log('Classifying stress from entry:', entry);
+  // Create cache key based on entry content
+  const cacheKey = `${entry.entryId || entry.date}-${entry.emotionalState}-${entry.notes?.substring(0, 50) || ''}`;
+  
+  // Check cache first
+  const cached = analysisCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp) < CACHE_TTL) {
+    return cached.result;
+  }
+  
+  // Clean cache if it gets too large
+  if (analysisCache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = analysisCache.keys().next().value;
+    analysisCache.delete(oldestKey);
+  }
   
   // Initialize stress level based on emotional state or primary emotion
   let stressLevel = 0;
@@ -75,23 +92,35 @@ export async function classifyStressFromEntry(entry, recentEntries = []) {
     }
   }
   
-  // If notes are available, analyze them for stress indicators
-  if (entry.notes) {
-    try {
-      const textAnalysis = await analyzeEmotionalText(entry.notes);
+  // Simplified text analysis - avoid expensive AI calls for basic cases
+  if (entry.notes && entry.notes.length > 10) {
+    // Simple keyword-based stress detection
+    const stressKeywords = ['stress', 'anxious', 'overwhelm', 'worry', 'panic', 'pressure', 'deadline'];
+    const lowerNotes = entry.notes.toLowerCase();
+    
+    const hasStressKeywords = stressKeywords.some(keyword => lowerNotes.includes(keyword));
+    
+    if (hasStressKeywords) {
+      stressLevel = Math.max(stressLevel, 3);
+      confidence = 'medium';
       
-      // Adjust stress level based on text analysis
-      if (textAnalysis.sentiment === 'negative') {
-        stressLevel = Math.max(stressLevel, 3);
-        confidence = 'high';
+      // Extract simple triggers from common patterns
+      if (lowerNotes.includes('work')) triggers.push('work');
+      if (lowerNotes.includes('money') || lowerNotes.includes('finance')) triggers.push('finances');
+      if (lowerNotes.includes('relationship')) triggers.push('relationships');
+      if (lowerNotes.includes('health')) triggers.push('health');
+    }
+    
+    // Only call expensive AI analysis for high-stress cases or when specifically needed
+    if (stressLevel >= 4 && entry.notes.length > 50) {
+      try {
+        const textAnalysis = await analyzeEmotionalText(entry.notes);
+        if (textAnalysis.topics && textAnalysis.topics.length > 0) {
+          triggers = [...new Set([...triggers, ...textAnalysis.topics])];
+        }
+      } catch (error) {
+        // Silently continue without AI analysis if it fails
       }
-      
-      // Extract potential stress topics
-      if (textAnalysis.topics && textAnalysis.topics.length > 0) {
-        triggers = [...new Set([...triggers, ...textAnalysis.topics])];
-      }
-    } catch (error) {
-      console.error('Error analyzing notes:', error);
     }
   }
   
@@ -152,7 +181,7 @@ export async function classifyStressFromEntry(entry, recentEntries = []) {
     suggestions.push('Regular mindfulness practice may help manage stress');
   }
   
-  return {
+  const result = {
     stressLevel,
     stressType,
     confidence,
@@ -162,6 +191,14 @@ export async function classifyStressFromEntry(entry, recentEntries = []) {
     source: entry.primaryEmotion ? 'enhanced' : 'basic',
     analyzedAt: new Date().toISOString()
   };
+
+  // Cache the result
+  analysisCache.set(cacheKey, {
+    result,
+    timestamp: Date.now()
+  });
+
+  return result;
 }
 
 /**

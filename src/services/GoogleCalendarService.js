@@ -7,11 +7,14 @@
 
 // Google API Configuration
 const GOOGLE_CONFIG = {
-  clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-  apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+  clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'demo-client-id',
+  apiKey: import.meta.env.VITE_GOOGLE_API_KEY || 'demo-api-key',
   discoveryDoc: 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest',
   scopes: 'https://www.googleapis.com/auth/calendar.events'
 };
+
+// Demo mode flag
+const IS_DEMO_MODE = !import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_GOOGLE_CLIENT_ID === 'demo-client-id';
 
 /**
  * Google Calendar OAuth Manager
@@ -172,6 +175,15 @@ export class GoogleCalendarOAuth {
    * Get current user's Google account info
    */
   async getUserInfo() {
+    if (IS_DEMO_MODE) {
+      return {
+        id: 'demo-user-123',
+        name: 'Demo User',
+        email: 'demo@example.com',
+        picture: 'https://via.placeholder.com/40/4ade80/ffffff?text=D'
+      };
+    }
+
     if (!this.isSignedIn()) {
       throw new Error('Not signed in to Google');
     }
@@ -202,12 +214,18 @@ export class GoogleCalendarOAuth {
 export class GoogleCalendarService {
   constructor() {
     this.oauth = new GoogleCalendarOAuth();
+    this.demoEvents = []; // Store demo events in memory
+    this.isDemoAuthenticated = false;
   }
 
   /**
    * Initialize the service
    */
   async initialize() {
+    if (IS_DEMO_MODE) {
+      console.log('Google Calendar running in demo mode');
+      return true;
+    }
     return await this.oauth.initialize();
   }
 
@@ -215,6 +233,11 @@ export class GoogleCalendarService {
    * Authenticate with Google
    */
   async authenticate() {
+    if (IS_DEMO_MODE) {
+      this.isDemoAuthenticated = true;
+      console.log('Demo authentication successful');
+      return true;
+    }
     return await this.oauth.signIn();
   }
 
@@ -222,6 +245,12 @@ export class GoogleCalendarService {
    * Sign out
    */
   async signOut() {
+    if (IS_DEMO_MODE) {
+      this.isDemoAuthenticated = false;
+      this.demoEvents = [];
+      console.log('Demo sign out successful');
+      return;
+    }
     return await this.oauth.signOut();
   }
 
@@ -229,6 +258,9 @@ export class GoogleCalendarService {
    * Check authentication status
    */
   isAuthenticated() {
+    if (IS_DEMO_MODE) {
+      return this.isDemoAuthenticated;
+    }
     return this.oauth.isSignedIn();
   }
 
@@ -258,6 +290,30 @@ export class GoogleCalendarService {
    * Create a wellness activity event
    */
   async createWellnessEvent(activityData) {
+    if (IS_DEMO_MODE) {
+      const { activity, scheduledTime, duration = 30 } = activityData;
+      const startTime = new Date(scheduledTime);
+      const endTime = new Date(startTime.getTime() + (duration * 60000));
+
+      const demoEvent = {
+        id: 'demo-event-' + Date.now(),
+        summary: `🧘 ${activity.name} - ResilientFlow`,
+        description: `${activity.description}\n\n📱 Activity from ResilientFlow app`,
+        start: {
+          dateTime: startTime.toISOString(),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        end: {
+          dateTime: endTime.toISOString(),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }
+      };
+
+      this.demoEvents.push(demoEvent);
+      console.log('Demo wellness event created:', demoEvent);
+      return demoEvent;
+    }
+
     if (!this.isAuthenticated()) {
       throw new Error('Not authenticated with Google');
     }
@@ -312,6 +368,37 @@ export class GoogleCalendarService {
    * Create a daily check-in reminder
    */
   async createDailyCheckInReminder(time = '19:00') { // Default 7 PM
+    if (IS_DEMO_MODE) {
+      const today = new Date();
+      const reminderTime = new Date();
+      const [hours, minutes] = time.split(':');
+      reminderTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+      // If time has passed today, start tomorrow
+      if (reminderTime <= today) {
+        reminderTime.setDate(reminderTime.getDate() + 1);
+      }
+
+      const demoEvent = {
+        id: 'demo-reminder-' + Date.now(),
+        summary: '📝 Daily Emotional Check-in - ResilientFlow',
+        description: 'Time for your daily emotional wellness check-in!',
+        start: {
+          dateTime: reminderTime.toISOString(),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        end: {
+          dateTime: new Date(reminderTime.getTime() + (15 * 60000)).toISOString(),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        recurrence: ['RRULE:FREQ=DAILY']
+      };
+
+      this.demoEvents.push(demoEvent);
+      console.log('Demo daily reminder created:', demoEvent);
+      return demoEvent;
+    }
+
     if (!this.isAuthenticated()) {
       throw new Error('Not authenticated with Google');
     }
@@ -372,6 +459,15 @@ export class GoogleCalendarService {
    * Get upcoming wellness events
    */
   async getUpcomingWellnessEvents(days = 7) {
+    if (IS_DEMO_MODE) {
+      // Return demo events
+      const now = new Date();
+      return this.demoEvents.filter(event => {
+        const eventDate = new Date(event.start.dateTime);
+        return eventDate > now && eventDate <= new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+      });
+    }
+
     if (!this.isAuthenticated()) {
       throw new Error('Not authenticated with Google');
     }
@@ -403,6 +499,13 @@ export class GoogleCalendarService {
    * Delete a wellness event
    */
   async deleteEvent(eventId) {
+    if (IS_DEMO_MODE) {
+      // Remove from demo events
+      this.demoEvents = this.demoEvents.filter(event => event.id !== eventId);
+      console.log('Demo event deleted:', eventId);
+      return true;
+    }
+
     if (!this.isAuthenticated()) {
       throw new Error('Not authenticated with Google');
     }
@@ -423,9 +526,12 @@ export class GoogleCalendarService {
   }
 
   /**
-   * Check if Google Calendar is configured
+   * Check if Google Calendar is configured (always true for demo mode)
    */
   static isConfigured() {
+    if (IS_DEMO_MODE) {
+      return true; // Always allow demo mode
+    }
     return !!(GOOGLE_CONFIG.clientId && 
               GOOGLE_CONFIG.apiKey && 
               GOOGLE_CONFIG.clientId !== 'your_google_client_id_here' &&

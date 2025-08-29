@@ -26,12 +26,9 @@ export function CircleChat({ circleId }) {
     sendMessage(circleId, messageText)
     setMessageText('')
     
-    // Force scroll to top after message is sent
+    // Scroll to bottom after message is sent (normal behavior)
     setTimeout(() => {
-      const chatContainer = document.querySelector('[data-chat-container]')
-      if (chatContainer) {
-        chatContainer.scrollTop = 0
-      }
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, 100)
   }
   
