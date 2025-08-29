@@ -37,7 +37,7 @@ const DEFAULT_SETTINGS = {
     allowEmotionAnalysis: true,
     allowStressDetection: true,
     allowPatternRecognition: true,
-    allowExternalIntegrations: false
+    allowExternalIntegrations: true
   },
   
   // Google Calendar integration settings
