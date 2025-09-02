@@ -4,6 +4,8 @@ import { AppShell } from './components/AppShell'
 import { HomePage } from './pages/HomePage'
 import { DashboardPage } from './pages/DashboardPage'
 import { ActivitiesPage } from './pages/ActivitiesPage'
+import { HomeActivities } from './components/HomeActivities'
+import { SimplifiedDashboard } from './components/SimplifiedDashboard'
 import { InsightsPage } from './pages/InsightsPage'
 import { CirclesPage } from './pages/CirclesPage'
 import { SettingsPage } from './pages/SettingsPage'
@@ -116,8 +118,10 @@ function App() {
     <>
       <AppShell>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/" element={<HomeActivities />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/dashboard" element={<SimplifiedDashboard />} />
+          <Route path="/dashboard/full" element={<DashboardPage />} />
           <Route path="/activities" element={<ActivitiesPage />} />
           <Route path="/insights" element={<InsightsPage />} />
           <Route path="/circles" element={<CirclesPage />} />
