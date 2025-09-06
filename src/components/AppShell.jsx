@@ -44,9 +44,8 @@ export function AppShell({ children }) {
   }, [])
 
   const navigation = [
-    { name: 'Home', href: '/', icon: Home },
+    { name: 'Activities', href: '/', icon: Activity },
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-    { name: 'Activities', href: '/activities', icon: Activity },
     { name: 'Insights', href: '/insights', icon: Brain },
     { name: 'Circles', href: '/circles', icon: Users },
     { name: 'Pricing', href: '/pricing', icon: CreditCard },
@@ -87,7 +86,7 @@ export function AppShell({ children }) {
               
               {/* Logo */}
               <Link to="/" className="text-xl font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-                ResilientFlow
+                Emogence
               </Link>
               
               {/* Desktop navigation */}

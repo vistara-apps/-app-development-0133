@@ -1,45 +1,35 @@
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card'
-import { Chart } from '../components/Chart'
-import { ProgressTracker } from '../components/ProgressTracker'
 import { useDataStore } from '../stores/dataStore'
 import { useCirclesStore } from '../stores/circlesStore'
 import { format, subDays } from 'date-fns'
 import { 
-  TrendingUp, 
-  Calendar, 
-  Activity, 
-  Target, 
-  Users, 
-  ArrowRight,
   Heart,
   Brain,
   Shield,
   CheckCircle,
-  Clock,
-  Award,
-  BarChart3,
-  Users2,
+  Target,
+  Users,
+  ArrowRight,
   Sparkles,
   Zap,
   Star,
-  BookOpen,
-  ActivitySquare
+  Activity,
+  TrendingUp,
+  Lightbulb
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export function DashboardPage() {
-  const { dailyEntries, activityLogs, activities, getRecentEntries, getActivityCompletionStreak, getCheckInStreak, getTodayEntry } = useDataStore()
-  const { circles, getAllCircles } = useCirclesStore()
+  const { dailyEntries, activityLogs, activities, getActivityCompletionStreak, getCheckInStreak, getTodayEntry } = useDataStore()
+  const { circles } = useCirclesStore()
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     setIsVisible(true)
-    // No need to call getAllCircles() since circles are already loaded
   }, [])
 
   const todayEntry = getTodayEntry()
-  const recentEntries = getRecentEntries(7)
   const activityStreak = getActivityCompletionStreak()
   const checkInStreak = getCheckInStreak()
 
@@ -50,34 +40,11 @@ export function DashboardPage() {
   }).reverse()
 
   // Calculate completion rates
-  const totalCheckIns = dailyEntries.filter(entry => 
-    last7Days.includes(entry.date)
-  ).length
-
   const totalActivities = activityLogs.filter(log => 
     last7Days.includes(log.completionDate)
   ).length
 
-  // Properly look up activity information from the activities array
-  const mindfulnessActivities = activityLogs.filter(log => {
-    if (!last7Days.includes(log.completionDate)) return false
-    const activity = activities.find(a => a.activityId === log.activityId)
-    return activity && activity.type === 'mindfulness'
-  }).length
-
-  const journalingActivities = activityLogs.filter(log => {
-    if (!last7Days.includes(log.completionDate)) return false
-    const activity = activities.find(a => a.activityId === log.activityId)
-    return activity && activity.type === 'mindfulness'
-  }).length
-
-  const socialActivities = activityLogs.filter(log => {
-    if (!last7Days.includes(log.completionDate)) return false
-    const activity = activities.find(a => a.activityId === log.activityId)
-    return activity && activity.type === 'social'
-  }).length
-
-  // Calculate emotional trends
+  // Calculate emotional trends for AI insights
   const emotionalTrends = last7Days.map(date => {
     const entry = dailyEntries.find(e => e.date === date)
     return {
@@ -86,61 +53,97 @@ export function DashboardPage() {
     }
   })
 
-  // Calculate activity completion trends
-  const activityTrends = last7Days.map(date => {
-    const dayActivities = activityLogs.filter(log => log.completionDate === date)
-    return {
-      date: format(new Date(date), 'MMM dd'),
-      completed: dayActivities.length
+  // Generate AI insights based on data
+  const generateAIInsights = () => {
+    const insights = []
+    
+    // Emotional trend insight
+    const recentScores = emotionalTrends.slice(-3).map(t => t.score).filter(s => s > 0)
+    if (recentScores.length >= 2) {
+      const avgScore = recentScores.reduce((a, b) => a + b, 0) / recentScores.length
+      if (avgScore >= 7) {
+        insights.push({
+          type: 'positive',
+          icon: <Heart className="h-5 w-5" />,
+          title: 'Great Emotional Balance',
+          message: 'Your emotional scores have been consistently high. Keep up the excellent work with your wellness practices!',
+          color: 'text-green-600',
+          bgColor: 'bg-green-50 dark:bg-green-950/20'
+        })
+      } else if (avgScore <= 4) {
+        insights.push({
+          type: 'support',
+          icon: <Shield className="h-5 w-5" />,
+          title: 'Time for Self-Care',
+          message: 'Your emotional scores suggest you might benefit from some extra mindfulness activities. Consider trying a breathing exercise.',
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-50 dark:bg-blue-950/20'
+        })
+      }
     }
-  })
 
-  const stats = [
-    {
-      label: 'Total Check-ins',
-      value: totalCheckIns,
-      icon: <CheckCircle className="h-5 w-5" />,
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50 dark:bg-emerald-950/20',
-      borderColor: 'border-emerald-200 dark:border-emerald-800',
-      change: '+12%',
-      changeColor: 'text-emerald-600'
-    },
-    {
-      label: 'Activities Completed',
-      value: totalActivities,
-      icon: <ActivitySquare className="h-5 w-5" />,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50 dark:bg-blue-950/20',
-      borderColor: 'border-blue-200 dark:border-blue-800',
-      change: '+8%',
-      changeColor: 'text-blue-600'
-    },
-    {
-      label: 'Current Streak',
-      value: `${activityStreak} days`,
-                       icon: <Target className="h-5 w-5" />,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50 dark:bg-purple-950/20',
-      borderColor: 'border-purple-200 dark:border-purple-800',
-      change: '+2 days',
-      changeColor: 'text-purple-600'
-    },
-    {
-      label: 'Check-in Streak',
-      value: `${checkInStreak} days`,
-      icon: <Clock className="h-5 w-5" />,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50 dark:bg-orange-950/20',
-      borderColor: 'border-orange-200 dark:border-orange-800',
-      change: '+1 day',
-      changeColor: 'text-orange-600'
+    // Activity streak insight
+    if (activityStreak >= 7) {
+      insights.push({
+        type: 'achievement',
+        icon: <Target className="h-5 w-5" />,
+        title: 'Amazing Consistency',
+        message: `${activityStreak} days in a row! Your commitment to wellness is building real momentum.`,
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-50 dark:bg-purple-950/20'
+      })
+    } else if (activityStreak === 0) {
+      insights.push({
+        type: 'motivation',
+        icon: <Zap className="h-5 w-5" />,
+        title: 'Ready to Start?',
+        message: 'Begin your wellness journey today with a simple 5-minute activity. Every step counts!',
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-50 dark:bg-orange-950/20'
+      })
     }
-  ]
+
+    // Activity type insight
+    const recentActivityTypes = activityLogs
+      .filter(log => last7Days.includes(log.completionDate))
+      .map(log => {
+        const activity = activities.find(a => a.activityId === log.activityId)
+        return activity?.type
+      })
+      .filter(Boolean)
+
+    const typeCounts = recentActivityTypes.reduce((acc, type) => {
+      acc[type] = (acc[type] || 0) + 1
+      return acc
+    }, {})
+
+    const mostUsedType = Object.keys(typeCounts).reduce((a, b) => typeCounts[a] > typeCounts[b] ? a : b, null)
+    
+    if (mostUsedType && typeCounts[mostUsedType] >= 3) {
+      const typeLabels = {
+        mindfulness: 'mindfulness',
+        social: 'social connection',
+        journaling: 'reflection'
+      }
+      
+      insights.push({
+        type: 'pattern',
+        icon: <Brain className="h-5 w-5" />,
+        title: 'Your Preferred Practice',
+        message: `You've been gravitating toward ${typeLabels[mostUsedType]} activities. This shows great self-awareness!`,
+        color: 'text-indigo-600',
+        bgColor: 'bg-indigo-50 dark:bg-indigo-950/20'
+      })
+    }
+
+    return insights.slice(0, 2) // Limit to 2 most relevant insights
+  }
+
+  const aiInsights = generateAIInsights()
 
   const recentActivities = activityLogs
     .filter(log => last7Days.includes(log.completionDate))
-    .slice(0, 5)
+    .slice(0, 3)
     .map(log => {
       const activity = activities.find(a => a.activityId === log.activityId)
       return {
@@ -152,332 +155,219 @@ export function DashboardPage() {
       }
     })
 
-  const weeklyProgress = [
-    { day: 'Mon', completed: 3, total: 5 },
-    { day: 'Tue', completed: 4, total: 5 },
-    { day: 'Wed', completed: 2, total: 5 },
-    { day: 'Thu', completed: 5, total: 5 },
-    { day: 'Fri', completed: 3, total: 5 },
-    { day: 'Sat', completed: 4, total: 5 },
-    { day: 'Sun', completed: 2, total: 5 }
-  ]
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-700">
-      {/* Header Section */}
-      <section className="container-padding pt-8 pb-12">
-        <div className="max-w-7xl mx-auto">
-          <div className={`fade-in-up ${isVisible ? 'visible' : ''} text-center mb-12`}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wellness-peace border border-wellness-calm/30 text-wellness-harmony font-medium mb-4">
-              <Sparkles className="h-4 w-4" />
-              Your Wellness Dashboard
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-balance mb-4">
-              Welcome back,
-              <span className="text-gradient-wellness block">Champion</span>
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Track your progress, celebrate your wins, and continue building your mental resilience.
-            </p>
-          </div>
+    <div className="space-y-8">
+      {/* Simple Header */}
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wellness-peace border border-wellness-calm/30 text-wellness-harmony font-medium">
+          <Sparkles className="h-4 w-4" />
+          Your Progress
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold text-balance">
+          How You're Doing
+        </h1>
+        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Simple insights about your emotional wellness journey.
+        </p>
+      </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {stats.map((stat, index) => (
-              <div 
-                key={stat.label}
-                className={`fade-in-up ${isVisible ? 'visible' : ''}`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <div className={`wellness-card h-full border ${stat.borderColor}`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`p-2 rounded-xl ${stat.bgColor}`}>
-                      <div className={stat.color}>
-                        {stat.icon}
-                      </div>
-                    </div>
-                    <div className={`text-sm font-medium ${stat.changeColor}`}>
-                      {stat.change}
+      {/* Key Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="wellness-card text-center p-4">
+          <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-pink-50 dark:bg-pink-950/20 mb-2">
+            <Heart className="h-4 w-4 text-pink-600" />
+          </div>
+          <div className="text-lg font-bold text-pink-600">
+            {todayEntry?.emotionalScore || 0}
+          </div>
+          <div className="text-xs text-gray-600 dark:text-gray-400">
+            Today's Score
+          </div>
+        </div>
+        
+        <div className="wellness-card text-center p-4">
+          <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/20 mb-2">
+            <Target className="h-4 w-4 text-blue-600" />
+          </div>
+          <div className="text-lg font-bold text-blue-600">
+            {activityStreak}
+          </div>
+          <div className="text-xs text-gray-600 dark:text-gray-400">
+            Day Streak
+          </div>
+        </div>
+        
+        <div className="wellness-card text-center p-4">
+          <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 dark:bg-green-950/20 mb-2">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+          </div>
+          <div className="text-lg font-bold text-green-600">
+            {totalActivities}
+          </div>
+          <div className="text-xs text-gray-600 dark:text-gray-400">
+            This Week
+          </div>
+        </div>
+      </div>
+
+      {/* AI Insights */}
+      {aiInsights.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Lightbulb className="h-5 w-5 text-yellow-600" />
+            <h2 className="text-xl font-semibold text-text-primary">AI Insights</h2>
+          </div>
+          
+          <div className="grid gap-4">
+            {aiInsights.map((insight, index) => (
+              <Card key={index} className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className={`p-2 rounded-lg ${insight.bgColor}`}>
+                    <div className={insight.color}>
+                      {insight.icon}
                     </div>
                   </div>
-                  <div className={`text-2xl font-bold ${stat.color} mb-1`}>
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {stat.label}
+                  <div className="flex-1">
+                    <h3 className="font-medium text-text-primary mb-1">
+                      {insight.title}
+                    </h3>
+                    <p className="text-sm text-text-secondary">
+                      {insight.message}
+                    </p>
                   </div>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         </div>
-      </section>
+      )}
 
-      {/* Charts Section */}
-      <section className="container-padding pb-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Emotional Trends Chart */}
-            <div className={`fade-in-up ${isVisible ? 'visible' : ''}`}>
-              <Card variant="wellness" className="h-full">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-pink-50 dark:bg-pink-950/20">
-                      <Heart className="h-5 w-5 text-pink-600" />
-                    </div>
-                    <div>
-                      <CardTitle>Emotional Trends</CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Your emotional score over the past week</p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Chart 
-                    data={emotionalTrends}
-                    xKey="date"
-                    yKey="score"
-                    color="pink"
-                    height={200}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Activity Completion Chart */}
-            <div className={`fade-in-up ${isVisible ? 'visible' : ''}`} style={{ transitionDelay: '100ms' }}>
-              <Card variant="wellness" className="h-full">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/20">
-                      <BarChart3 className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <CardTitle>Activity Completion</CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Daily activity completion rates</p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Chart 
-                    data={activityTrends}
-                    xKey="date"
-                    yKey="completed"
-                    color="blue"
-                    height={200}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+      {/* Recent Activities */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-text-primary">Recent Activities</h2>
+          <Link 
+            to="/" 
+            className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+          >
+            Start New
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
-      </section>
-
-      {/* Progress & Activities Section */}
-      <section className="container-padding pb-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Weekly Progress */}
-            <div className={`fade-in-up ${isVisible ? 'visible' : ''}`} style={{ transitionDelay: '200ms' }}>
-              <Card variant="wellness" className="h-full">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-green-50 dark:bg-green-950/20">
-                      <Target className="h-5 w-5 text-green-600" />
-                    </div>
-                    <div>
-                      <CardTitle>Weekly Progress</CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Your daily activity goals</p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ProgressTracker 
-                    data={weeklyProgress}
-                    height={200}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Activities */}
-            <div className={`fade-in-up ${isVisible ? 'visible' : ''}`} style={{ transitionDelay: '300ms' }}>
-              <Card variant="wellness" className="h-full">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/20">
-                        <Activity className="h-5 w-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <CardTitle>Recent Activities</CardTitle>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Your latest completed activities</p>
-                      </div>
-                    </div>
-                    <Link 
-                      to="/activities" 
-                      className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
-                    >
-                      View All
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {recentActivities.length > 0 ? (
-                      recentActivities.map((activity, index) => (
-                        <div 
-                          key={activity.id}
-                          className="flex items-center justify-between p-3 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-lg ${
-                              activity.type === 'mindfulness' ? 'bg-blue-100 dark:bg-blue-900/30' :
-                              activity.type === 'social' ? 'bg-green-100 dark:bg-green-900/30' :
-                              'bg-purple-100 dark:bg-purple-900/30'
-                            }`}>
-                              {activity.type === 'mindfulness' ? <Brain className="h-4 w-4 text-blue-600" /> :
-                               activity.type === 'social' ? <Users className="h-4 w-4 text-green-600" /> :
-                               <BookOpen className="h-4 w-4 text-purple-600" />}
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900 dark:text-gray-100">{activity.name}</div>
-                              <div className="text-sm text-gray-600 dark:text-gray-400">{activity.date} • {activity.duration}</div>
-                            </div>
-                          </div>
-                          <CheckCircle className="h-5 w-5 text-emerald-600" />
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-center py-8">
-                        <Activity className="h-12 w-12 text-neutral-400 mx-auto mb-3" />
-                        <p className="text-gray-600 dark:text-gray-400">No activities completed yet this week</p>
-                        <Link 
-                          to="/activities" 
-                          className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium mt-2"
-                        >
-                          Start your first activity
-                          <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Community & Circles Section */}
-      <section className="container-padding pb-16">
-        <div className="max-w-7xl mx-auto">
-          <div className={`fade-in-up ${isVisible ? 'visible' : ''}`} style={{ transitionDelay: '400ms' }}>
-            <Card variant="wellness">
-              <CardHeader>
+        
+        {recentActivities.length > 0 ? (
+          <div className="space-y-3">
+            {recentActivities.map((activity) => (
+              <Card key={activity.id} className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/20">
-                      <Users2 className="h-5 w-5 text-indigo-600" />
+                    <div className={`p-2 rounded-lg ${
+                      activity.type === 'mindfulness' ? 'bg-blue-100 dark:bg-blue-900/30' :
+                      activity.type === 'social' ? 'bg-green-100 dark:bg-green-900/30' :
+                      'bg-purple-100 dark:bg-purple-900/30'
+                    }`}>
+                      {activity.type === 'mindfulness' ? <Brain className="h-4 w-4 text-blue-600" /> :
+                       activity.type === 'social' ? <Users className="h-4 w-4 text-green-600" /> :
+                       <Heart className="h-4 w-4 text-purple-600" />}
                     </div>
                     <div>
-                      <CardTitle>Your Support Circles</CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Connect with your wellness community</p>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">{activity.name}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">{activity.date}</div>
                     </div>
                   </div>
-                  <Link 
-                    to="/circles" 
-                    className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
-                  >
-                    Manage Circles
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
+                  <CheckCircle className="h-5 w-5 text-emerald-600" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                {circles.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {circles.slice(0, 3).map((circle) => (
-                      <div 
-                        key={circle.circleId}
-                        className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 transition-colors"
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
-                            <Users className="h-4 w-4 text-white" />
-                          </div>
-                          <div className="font-medium text-gray-900 dark:text-gray-100">{circle.name}</div>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{circle.description}</p>
-                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                          <span>{circle.memberCount || 0} members</span>
-                          <span className={`px-2 py-1 rounded-full ${
-                            circle.privacy === 'public' 
-                              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                              : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
-                          }`}>
-                            {circle.privacy}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Users2 className="h-12 w-12 text-neutral-400 mx-auto mb-3" />
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">You haven't joined any support circles yet</p>
-                    <Link 
-                      to="/circles" 
-                      className="inline-flex items-center gap-2 wellness-button"
-                    >
-                      <Zap className="h-4 w-4" />
-                      Discover Circles
-                    </Link>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </Card>
+            ))}
           </div>
-        </div>
-      </section>
+        ) : (
+          <Card className="p-8 text-center">
+            <Activity className="h-12 w-12 text-neutral-400 mx-auto mb-3" />
+            <p className="text-gray-600 dark:text-gray-400 mb-4">No activities completed yet this week</p>
+            <Link 
+              to="/" 
+              className="inline-flex items-center gap-2 wellness-button"
+            >
+              <Zap className="h-4 w-4" />
+              Start Your First Activity
+            </Link>
+          </Card>
+        )}
+      </div>
 
-      {/* Quick Actions Section */}
-      <section className="container-padding pb-16">
-        <div className="max-w-4xl mx-auto">
-          <div className={`fade-in-up ${isVisible ? 'visible' : ''}`} style={{ transitionDelay: '500ms' }}>
-            <Card variant="wellness" className="text-center p-8 md:p-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r from-wellness-calm to-wellness-peace mb-6">
-                <Star className="h-8 w-8 text-white" />
-              </div>
-              
-              <h2 className="text-3xl md:text-4xl font-bold text-balance mb-4">
-                Ready for Your Next Activity?
-              </h2>
-              
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-                Continue building your resilience with personalized activities and guided sessions.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link 
-                  to="/activities"
-                  className="wellness-button group"
-                >
-                  <Activity className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
-                  Start Activity
-                </Link>
-                
-                <Link 
-                  to="/dashboard"
-                  className="btn-secondary px-6 py-3 text-base font-semibold"
-                >
-                  View Progress
-                </Link>
-              </div>
-            </Card>
-          </div>
+      {/* Support Circles */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-text-primary">Support Circles</h2>
+          <Link 
+            to="/circles" 
+            className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+          >
+            Manage
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
-      </section>
+        
+        {circles.length > 0 ? (
+          <div className="grid gap-3">
+            {circles.slice(0, 2).map((circle) => (
+              <Card key={circle.circleId} className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
+                    <Users className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{circle.name}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{circle.memberCount || 0} members</div>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    circle.privacy === 'public' 
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
+                  }`}>
+                    {circle.privacy}
+                  </span>
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card className="p-6 text-center">
+            <Users className="h-12 w-12 text-neutral-400 mx-auto mb-3" />
+            <p className="text-gray-600 dark:text-gray-400 mb-4">Join a support circle to practice together</p>
+            <Link 
+              to="/circles" 
+              className="inline-flex items-center gap-2 wellness-button"
+            >
+              <Zap className="h-4 w-4" />
+              Discover Circles
+            </Link>
+          </Card>
+        )}
+      </div>
+
+      {/* Quick Action */}
+      <Card className="p-6 text-center">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-wellness-calm to-wellness-peace mb-4">
+          <Star className="h-6 w-6 text-white" />
+        </div>
+        
+        <h3 className="text-lg font-semibold mb-2">
+          Ready for Your Next Activity?
+        </h3>
+        
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+          Continue building your emotional strength with simple, effective practices.
+        </p>
+        
+        <Link 
+          to="/"
+          className="wellness-button"
+        >
+          <Activity className="mr-2 h-4 w-4" />
+          Start Activity
+        </Link>
+      </Card>
     </div>
   )
 }
