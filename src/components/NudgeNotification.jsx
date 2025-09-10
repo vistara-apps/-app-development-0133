@@ -22,7 +22,17 @@ import {
   Clock,
   BatteryCharging
 } from 'lucide-react';
-import { NudgeTypes } from '../models/EmotionalDataTypes';
+// Mock NudgeTypes for demo purposes
+const NudgeTypes = {
+  BREATHING: 'breathing',
+  MINDFULNESS: 'mindfulness',
+  PERSPECTIVE: 'perspective',
+  ACTIVITY: 'activity',
+  BREAK: 'break',
+  SOCIAL: 'social',
+  GRATITUDE: 'gratitude',
+  RECOVERY: 'recovery'
+};
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function NudgeNotification({ 

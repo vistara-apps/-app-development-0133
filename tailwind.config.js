@@ -54,14 +54,18 @@ export default {
           DEFAULT: '#22c55e',
           foreground: '#ffffff',
         },
-        // Wellness-specific colors
+        // Wellness-specific colors - Soothing blues/greens palette
         wellness: {
-          calm: '#a8dadc',
-          peace: '#f1faee',
-          growth: '#a8dadc',
-          energy: '#f4a261',
-          balance: '#e9c46a',
-          harmony: '#264653',
+          calm: '#a8dadc',      // Soft blue-green
+          peace: '#f1faee',     // Very light green
+          growth: '#81c784',    // Gentle green
+          energy: '#64b5f6',    // Soft blue
+          balance: '#90caf9',   // Light blue
+          harmony: '#4a90a4',   // Muted teal
+          serenity: '#e3f2fd',  // Very light blue
+          tranquility: '#f0f8ff', // Alice blue
+          nature: '#66bb6a',    // Nature green
+          ocean: '#42a5f5',     // Ocean blue
         },
         // Modern neutral palette
         neutral: {
@@ -141,8 +145,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Open Sans', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Open Sans', 'Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'xs': ['0.75rem', { lineHeight: '1rem' }],

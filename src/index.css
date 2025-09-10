@@ -60,6 +60,15 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* Ensure dark mode background is applied to html and body */
+  .dark body {
+    @apply bg-neutral-900;
+  }
+
+  .dark #root {
+    @apply bg-neutral-900;
+  }
+
   /* Enhanced dark mode text contrast */
   .dark {
     --text-primary: 0 0% 98%;
@@ -385,6 +394,30 @@
   /* Text utilities */
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Accessibility utilities */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .focus\:not-sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
   }
 
   /* Spacing utilities */

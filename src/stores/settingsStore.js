@@ -6,7 +6,6 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 // Default settings
 const DEFAULT_SETTINGS = {
@@ -76,47 +75,39 @@ const DEFAULT_SETTINGS = {
   }
 };
 
-// Create the store with persistence
-export const useSettingsStore = create(
-  persist(
-    (set, get) => ({
-      // Initialize with default settings
-      ...DEFAULT_SETTINGS,
-      
-      // Update all settings
-      updateSettings: (newSettings) => set({ ...newSettings }),
-      
-      // Update specific settings category
-      updateFeatures: (features) => set({ features: { ...get().features, ...features } }),
-      updatePreferences: (preferences) => set({ preferences: { ...get().preferences, ...preferences } }),
-      updatePrivacy: (privacy) => set({ privacy: { ...get().privacy, ...privacy } }),
-      updateGoogleCalendar: (googleCalendar) => set({ googleCalendar: { ...get().googleCalendar, ...googleCalendar } }),
-      updateSlack: (slack) => set({ slack: { ...get().slack, ...slack } }),
-      updateNotifications: (notifications) => set({ notifications: { ...get().notifications, ...notifications } }),
-      updateTheme: (theme) => set({ theme: { ...get().theme, ...theme } }),
-      
-      // Toggle feature on/off
-      toggleFeature: (featureName) => set({
-        features: {
-          ...get().features,
-          [featureName]: !get().features[featureName]
-        }
-      }),
-      
-      // Reset settings to defaults
-      resetSettings: () => set(DEFAULT_SETTINGS),
-      
-      // Reset specific category to defaults
-      resetCategory: (category) => set({
-        [category]: DEFAULT_SETTINGS[category]
-      })
-    }),
-    {
-      name: 'resilify-settings', // Storage key
-      getStorage: () => localStorage // Use localStorage for persistence
+// Create the store
+export const useSettingsStore = create((set, get) => ({
+  // Initialize with default settings
+  ...DEFAULT_SETTINGS,
+  
+  // Update all settings
+  updateSettings: (newSettings) => set({ ...newSettings }),
+  
+  // Update specific settings category
+  updateFeatures: (features) => set({ features: { ...get().features, ...features } }),
+  updatePreferences: (preferences) => set({ preferences: { ...get().preferences, ...preferences } }),
+  updatePrivacy: (privacy) => set({ privacy: { ...get().privacy, ...privacy } }),
+  updateGoogleCalendar: (googleCalendar) => set({ googleCalendar: { ...get().googleCalendar, ...googleCalendar } }),
+  updateSlack: (slack) => set({ slack: { ...get().slack, ...slack } }),
+  updateNotifications: (notifications) => set({ notifications: { ...get().notifications, ...notifications } }),
+  updateTheme: (theme) => set({ theme: { ...get().theme, ...theme } }),
+  
+  // Toggle feature on/off
+  toggleFeature: (featureName) => set({
+    features: {
+      ...get().features,
+      [featureName]: !get().features[featureName]
     }
-  )
-);
+  }),
+  
+  // Reset settings to defaults
+  resetSettings: () => set(DEFAULT_SETTINGS),
+  
+  // Reset specific category to defaults
+  resetCategory: (category) => set({
+    [category]: DEFAULT_SETTINGS[category]
+  })
+}));
 
 export default useSettingsStore;
 

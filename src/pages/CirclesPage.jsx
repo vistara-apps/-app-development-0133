@@ -84,7 +84,7 @@ export function CirclesPage() {
   }
   
   return (
-    <div className="space-y-12 max-w-7xl mx-auto">
+    <div className="space-y-12 max-w-6xl mx-auto">
       {/* Header Section */}
       <div className="text-center space-y-6">
         <div className="space-y-4">

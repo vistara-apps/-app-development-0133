@@ -7,8 +7,8 @@
 
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co'
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://enlsvqrfgktlndrnbojk.supabase.co'
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVubHN2cXJmZ2t0bG5kcm5ib2prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3MjAyMzIsImV4cCI6MjA1OTI5NjIzMn0.m-5RQwMmu5_aJyYDNKVMFF5ugWEtmpcZT4jjBMm3Pos'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 

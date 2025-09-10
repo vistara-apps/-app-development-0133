@@ -20,7 +20,14 @@ import {
   Database,
   Lock
 } from 'lucide-react';
-import { recordUserConsent, getUserPrivacySettings } from '../services/PrivacyService';
+// Mock privacy service functions for demo purposes
+const recordUserConsent = (userId, consent, version) => {
+  console.log('Privacy consent recorded:', { userId, consent, version });
+};
+
+const getUserPrivacySettings = (userId) => {
+  return { consentGiven: false };
+};
 
 export function PrivacyConsent({ 
   userId, 

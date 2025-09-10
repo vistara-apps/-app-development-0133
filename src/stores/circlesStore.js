@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { format, subDays } from 'date-fns'
 import { useAuthStore } from './authStore'
 import { useDataStore } from './dataStore'
+import { SupportCircles, CircleMessages, Auth } from '../services/supabase'
 
 // Mock users for circles
 const mockUsers = [
@@ -482,6 +483,182 @@ export const useCirclesStore = create((set, get) => ({
       activityData,
       emotionalData,
       streakData
+    }
+  }
+}))
+
+// Mock circles data for fallback
+const mockCircles = [
+  {
+    id: 'circle-1',
+    name: 'Mindfulness Masters',
+    description: 'A group focused on daily mindfulness practices and supporting each other through stressful periods.',
+    focus_area: 'Stress Management',
+    created_at: new Date().toISOString(),
+    created_by: 'user-2',
+    is_private: false,
+    member_limit: 10,
+    prompt_of_the_day: 'What is one small thing you did today to take care of yourself?'
+  },
+  {
+    id: 'circle-2',
+    name: 'Gratitude Gang',
+    description: 'Share daily gratitude practices and celebrate small wins together.',
+    focus_area: 'Positive Thinking',
+    created_at: new Date().toISOString(),
+    created_by: 'user-3',
+    is_private: true,
+    member_limit: 8,
+    prompt_of_the_day: 'Share three things you are grateful for today.'
+  }
+]
+
+// Additional Supabase-integrated methods
+export const useCirclesStoreSupabase = create((set, get) => ({
+  // State
+  circles: [],
+  userCircles: [],
+  messages: {},
+  initialized: false,
+
+  // Actions
+  initialize: async () => {
+    if (get().initialized) return
+    
+    try {
+      console.log('🔄 Initializing circles store with Supabase...')
+      
+      // Get current user
+      const { data: { user } } = await Auth.getSession()
+      if (user) {
+        // Load circles from Supabase
+        const [allCircles, userCircles] = await Promise.all([
+          SupportCircles.getAll(),
+          SupportCircles.getByUserId(user.id)
+        ])
+        
+        set({ 
+          circles: allCircles || [],
+          userCircles: userCircles || [],
+          initialized: true 
+        })
+        
+        console.log('✅ Circles store initialized with Supabase data')
+      } else {
+        // No user logged in, use mock data for demo
+        console.log('ℹ️ No user logged in, using mock circles data')
+        set({ 
+          circles: mockCircles,
+          userCircles: mockCircles.slice(0, 2),
+          initialized: true 
+        })
+      }
+    } catch (error) {
+      console.error('❌ Failed to initialize circles store:', error)
+      // Fallback to mock data
+      set({ 
+        circles: mockCircles,
+        userCircles: mockCircles.slice(0, 2),
+        initialized: true 
+      })
+    }
+  },
+
+  // Get all circles
+  getAllCircles: () => {
+    return get().circles
+  },
+
+  // Get user's circles
+  getUserCircles: () => {
+    return get().userCircles
+  },
+
+  // Join a circle
+  joinCircle: async (circleId) => {
+    try {
+      const { data: { user } } = await Auth.getSession()
+      if (user) {
+        await SupportCircles.joinCircle(user.id, circleId)
+        
+        // Update local state
+        const circle = get().circles.find(c => c.id === circleId)
+        if (circle) {
+          set(state => ({
+            userCircles: [...state.userCircles, circle]
+          }))
+        }
+        
+        console.log('✅ Joined circle in Supabase')
+      }
+    } catch (error) {
+      console.error('❌ Failed to join circle:', error)
+    }
+  },
+
+  // Leave a circle
+  leaveCircle: async (circleId) => {
+    try {
+      const { data: { user } } = await Auth.getSession()
+      if (user) {
+        await SupportCircles.leaveCircle(user.id, circleId)
+        
+        // Update local state
+        set(state => ({
+          userCircles: state.userCircles.filter(c => c.id !== circleId)
+        }))
+        
+        console.log('✅ Left circle in Supabase')
+      }
+    } catch (error) {
+      console.error('❌ Failed to leave circle:', error)
+    }
+  },
+
+  // Send message to circle
+  sendMessage: async (circleId, content) => {
+    try {
+      const { data: { user } } = await Auth.getSession()
+      if (user) {
+        const message = await CircleMessages.create({
+          circle_id: circleId,
+          user_id: user.id,
+          content,
+          message_type: 'text'
+        })
+        
+        // Update local state
+        set(state => ({
+          messages: {
+            ...state.messages,
+            [circleId]: [...(state.messages[circleId] || []), message]
+          }
+        }))
+        
+        console.log('✅ Message sent to Supabase')
+      }
+    } catch (error) {
+      console.error('❌ Failed to send message:', error)
+    }
+  },
+
+  // Get circle messages
+  getCircleMessages: async (circleId) => {
+    try {
+      const messages = await CircleMessages.getByCircleId(circleId)
+      
+      // Update local state
+      set(state => ({
+        messages: {
+          ...state.messages,
+          [circleId]: messages
+        }
+      }))
+      
+      return messages
+    } catch (error) {
+      console.error('❌ Failed to get messages:', error)
+      return []
     }
   }
 }))

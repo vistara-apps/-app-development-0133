@@ -19,6 +19,7 @@ import {
 import { useAuthStore } from '../stores/authStore'
 import { ThemeToggle } from './ThemeToggle'
 import { useThemeStore } from '../stores/themeStore'
+import WellnessNotifications from './WellnessNotifications'
 
 export function AppShell({ children }) {
   const location = useLocation()
@@ -60,7 +61,7 @@ export function AppShell({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-neutral-900">
+    <div className="min-h-screen bg-white dark:bg-neutral-900 flex flex-col">
       {/* Header */}
               <header className={`sticky top-0 z-30 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700 transition-shadow ${
         scrolled ? 'shadow-sm' : ''
@@ -86,7 +87,7 @@ export function AppShell({ children }) {
               
               {/* Logo */}
               <Link to="/" className="text-xl font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-                Emogence
+                ResilientFlow
               </Link>
               
               {/* Desktop navigation */}
@@ -110,6 +111,9 @@ export function AppShell({ children }) {
             </div>
             
             <div className="flex items-center space-x-3">
+              {/* Notifications */}
+              <WellnessNotifications />
+              
               {/* Theme toggle */}
               <ThemeToggle />
               
@@ -224,7 +228,7 @@ export function AppShell({ children }) {
       </header>
 
       {/* Main Content */}
-      <main className="relative flex flex-col items-center p-6 justify-center bg-white dark:bg-neutral-900">
+      <main className="relative bg-white dark:bg-neutral-900 pb-20 md:pb-8 flex-1">
         {children}
       </main>
 

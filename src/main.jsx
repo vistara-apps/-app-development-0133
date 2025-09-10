@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import App from './App.jsx'
+import App from './App-fixed.jsx'
 import './index.css'
 import { ToastProvider } from './components/ToastProvider'
 import { useThemeStore } from './stores/themeStore'
 
-// Initialize theme store before rendering
+// Initialize theme before rendering
 const { initTheme } = useThemeStore.getState()
 initTheme()
 

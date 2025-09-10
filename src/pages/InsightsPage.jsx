@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Card } from '../components/Card'
 import { Button } from '../components/Button'
 import { WeeklyReport } from '../components/WeeklyReport'
+import WeeklySummaryChart from '../components/WeeklySummaryChart'
 import { useDataStore } from '../stores/dataStore'
 import { useAuthStore } from '../stores/authStore'
 import { useCirclesStore } from '../stores/circlesStore'
@@ -165,7 +166,7 @@ export function InsightsPage() {
   // Render insights tab
   const renderInsightsTab = () => {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-6xl mx-auto">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-medium text-text-primary">Your Insights</h2>
           
@@ -344,6 +345,12 @@ export function InsightsPage() {
   const renderDataSummaryTab = () => {
     return (
       <div className="space-y-6">
+        {/* Weekly Summary Chart */}
+        <WeeklySummaryChart 
+          title="Weekly Wellness Progress"
+          type="line"
+        />
+        
         <Card className="p-6">
           <h3 className="text-lg font-medium text-text-primary mb-4">Data Summary</h3>
           <div className="grid md:grid-cols-3 gap-6">
@@ -516,7 +523,7 @@ export function InsightsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-6xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Personalized Insights</h1>
         <p className="text-text-secondary">AI-powered analysis of your emotional patterns</p>

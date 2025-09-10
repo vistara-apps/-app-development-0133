@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { HomePage } from './pages/HomePage'
@@ -20,27 +20,42 @@ import { PrivacyConsent } from './components/PrivacyConsent'
 import { NudgeNotification } from './components/NudgeNotification'
 import { PaymentModal } from './components/PaymentModal'
 import { useContextualNudges } from './hooks/useContextualNudges'
+import { ABTestingProvider } from './components/ABTesting'
+import { SkipToMainContent } from './components/AccessibilityWrapper'
 
 function App() {
   const { isAuthenticated, user } = useAuthStore()
   const { features } = useSettingsStore()
   const { initialize: initializeDataStore, initialized } = useDataStore()
   const [showPrivacyConsent, setShowPrivacyConsent] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
 
-  // Initialize data store when app loads
+  // Initialize data store when app loads with error handling
   useEffect(() => {
-    initializeDataStore()
-  }, [])
+    const initApp = async () => {
+      try {
+        setIsLoading(true)
+        await initializeDataStore()
+        console.log('✅ App initialized successfully')
+      } catch (error) {
+        console.error('❌ Failed to initialize app:', error)
+        // Continue anyway with mock data
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    initApp()
+  }, [initializeDataStore])
   
-  
-  // Initialize contextual nudges if enabled
+  // Initialize contextual nudges if enabled (with error handling)
   const { 
     currentNudge, 
     markNudgeAsViewed, 
     markNudgeAsActioned, 
     dismissNudge 
-  } = features.contextualNudges ? useContextualNudges({
+  } = features?.contextualNudges ? useContextualNudges({
     autoGenerate: true,
     deliveryChannel: 'app'
   }) : { currentNudge: null };
@@ -63,7 +78,9 @@ function App() {
   // Handle nudge action with navigation
   const handleNudgeAction = (nudgeId, details) => {
     // First mark the nudge as actioned
-    markNudgeAsActioned(nudgeId, details);
+    if (markNudgeAsActioned) {
+      markNudgeAsActioned(nudgeId, details);
+    }
     
     // Then navigate based on nudge type
     if (currentNudge) {
@@ -93,6 +110,19 @@ function App() {
     }
   };
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-wellness-serenity via-wellness-tranquility to-wellness-peace flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+          <h2 className="text-xl font-semibold text-text-primary">Loading ResilientFlow...</h2>
+          <p className="text-text-secondary">Preparing your wellness journey</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!isAuthenticated) {
     return <AuthPage />
   }
@@ -114,22 +144,25 @@ function App() {
   }
 
   return (
-    <>
+    <ABTestingProvider>
+      <SkipToMainContent />
       <AppShell>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/activities" element={<HomePage />} />
-          <Route path="/insights" element={<InsightsPage />} />
-          <Route path="/circles" element={<CirclesPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
-          <Route path="/integrations" element={<IntegrationsPage />} />
-          <Route path="/integrations/calendar" element={<IntegrationsPage />} />
-          <Route path="/integrations/slack" element={<IntegrationsPage />} />
-          <Route path="/test" element={<TestPage />} />
-        </Routes>
+        <main id="main-content" role="main" aria-label="Main content">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/activities" element={<HomePage />} />
+            <Route path="/insights" element={<InsightsPage />} />
+            <Route path="/circles" element={<CirclesPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/privacy" element={<PrivacySettingsPage />} />
+            <Route path="/integrations" element={<IntegrationsPage />} />
+            <Route path="/integrations/calendar" element={<IntegrationsPage />} />
+            <Route path="/integrations/slack" element={<IntegrationsPage />} />
+            <Route path="/test" element={<TestPage />} />
+          </Routes>
+        </main>
       </AppShell>
       
       {/* Contextual Nudge Notification */}
@@ -146,7 +179,7 @@ function App() {
 
       {/* Payment Modal */}
       <PaymentModal />
-    </>
+    </ABTestingProvider>
   )
 }
 
